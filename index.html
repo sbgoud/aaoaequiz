@@ -31,16 +31,17 @@
         .btn-disabled {
             background-color: #9ca3af; /* gray-400 */
             cursor: not-allowed;
+            opacity: 0.6;
         }
         .option-btn.correct {
-            background-color: #22c55e; /* green-500 */
-            color: white;
-            border-color: #16a34a; /* green-600 */
+            background-color: #22c55e !important; /* green-500 */
+            color: white !important;
+            border-color: #16a34a !important; /* green-600 */
         }
         .option-btn.incorrect {
-            background-color: #ef4444; /* red-500 */
-            color: white;
-            border-color: #dc2626; /* red-600 */
+            background-color: #ef4444 !important; /* red-500 */
+            color: white !important;
+            border-color: #dc2626 !important; /* red-600 */
         }
     </style>
 </head>
@@ -75,7 +76,7 @@
 
             <!-- Progress Bar -->
             <div class="w-full bg-gray-200 rounded-full h-2.5 mb-6">
-                <div id="progress-bar" class="bg-indigo-600 h-2.5 rounded-full" style="width: 0%"></div>
+                <div id="progress-bar" class="bg-indigo-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
             </div>
         </div>
 
@@ -87,7 +88,7 @@
             </div>
             <p id="feedback-message" class="mt-4 text-center font-medium min-h-[24px]"></p>
             <div class="flex justify-between mt-6">
-                <button id="prev-btn" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">← Previous</button>
+                <button id="prev-btn" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors">← Previous</button>
                 <div id="next-btn-container" class="hidden">
                    <button id="next-btn" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-colors">Next →</button>
                 </div>
@@ -104,669 +105,152 @@
 
 <script>
 // --- Data Structure for Quiz Questions ---
+// This constant holds all the questions, options, and correct answers for the quiz.
 const quizData = [
     // Economics Questions
-    {
-        question: "Who appoints the CAG of India?",
-        options: ["Chief Justice of India", "Prime Minister of India", "President of India", "Vice-President of India"],
-        answer: "President of India"
-    },
-    {
-        question: "Comptroller and Auditor General of India acts as a Friend, Philosopher and Guide for:",
-        options: ["Finance Ministry", "Finance Commission", "PAC", "Prime Minister"],
-        answer: "PAC"
-    },
-    {
-        question: "Who is the present CAG of India? (As of Oct 2017)",
-        options: ["Shashi Kant Sharma", "Rajiv Mehrishi", "Vinod Rai", "V. Narahari Rao"],
-        answer: "Rajiv Mehrishi"
-    },
-    {
-        question: "Which of the following statements is correct regarding the CAG?",
-        options: ["The CAG is an agent of the Parliament and conducts audit of expenditure on behalf of the Parliament.", "CAG holds office for a period of five years or up to the age of 65 years.", "CAG submits his audit reports relating to the accounts of state to the President.", "All are correct."],
-        answer: "The CAG is an agent of the Parliament and conducts audit of expenditure on behalf of the Parliament."
-    },
-    {
-        question: "As per which article of the Indian Constitution, 'The accounts of the Union and of the States shall be kept in such form as the President may, on the advice of the Comptroller and Auditor-General of India, prescribe.'?",
-        options: ["148", "149", "150", "280"],
-        answer: "150"
-    },
-    {
-        question: "Who among the following was the first CAG of India?",
-        options: ["V. Narahari Rao", "Vinod Rai", "Shashikant Sharma", "K.C. Neogy."],
-        answer: "V. Narahari Rao"
-    },
-    {
-        question: "The tenure of CAG is:",
-        options: ["5 Years", "3 Years or 60 Years of age, whichever is earlier", "6 Years", "6 Years or 65 Years of age, whichever is earlier."],
-        answer: "6 Years or 65 Years of age, whichever is earlier."
-    },
-    {
-        question: "According to which article of the Constitution of India does the 'CAG of India ascertains and certifies the net proceeds of any tax or duty. His certification is final.'?",
-        options: ["Article 148", "Article 280", "Article 279", "Article 149"],
-        answer: "Article 279"
-    },
-    {
-        question: "Which one of the following variables was not used by the Fourteenth Finance Commission for Horizontal devolution of money to the states?",
-        options: ["Income Distance", "Area", "Population Census 1971", "Literacy Rate"],
-        answer: "Literacy Rate"
-    },
-    {
-        question: "Which of the following states got the highest share in taxes by the 14th Finance Commission recommendation?",
-        options: ["J&K", "Uttar Pradesh", "Bihar", "Maharashtra"],
-        answer: "Uttar Pradesh"
-    },
-    {
-        question: "Which of the following roles/functions/responsibilities are NOT under the purview of the Finance commission?",
-        options: ["Sharing of net proceeds of taxes between the Center and States.", "Recommending principles for governing the grants-in-aid to the states by the Center.", "Preparation and periodical revision of electoral rolls.", "Recommendations on matters referred to it by the President for the interest of sound finance."],
-        answer: "Preparation and periodical revision of electoral rolls."
-    },
-    {
-        question: "The Constitution of India envisages the ________ as the balancing wheel of fiscal federalism in India.",
-        options: ["CAG", "Finance commission", "NITI AAYOG", "RBI"],
-        answer: "Finance commission"
-    },
-    {
-        question: "Article ________ of the Indian Constitution provides for a Finance Commission as a quasi-judicial body.",
-        options: ["280", "281", "275", "None of the above."],
-        answer: "280"
-    },
-    {
-        question: "Who was the chairman of Fourteenth Finance Commission?",
-        options: ["Y.V. Reddy", "Dr. Vijay Kelkar", "Dr. C. Rangrajan", "Dr. K.C. Neogy"],
-        answer: "Y.V. Reddy"
-    },
-    {
-        question: "The Fourteenth Finance Commission has recommended states' share in net proceeds of tax revenues be ________ per cent, a huge jump from the ________ per cent recommend by the 13th Finance Commission.",
-        options: ["50, 40", "45, 35", "40, 15", "42, 32"],
-        answer: "42, 32"
-    },
-    {
-        question: "Who among the following is considered 'The Guardian of Public Purse' in India:",
-        options: ["Finance Commission", "NITI Aayog", "CAG", "RBI"],
-        answer: "CAG"
-    },
-    {
-        question: "Which of the following is not a constitutional body?",
-        options: ["Finance Commission", "CAG", "Election Commission", "NITI Aayog"],
-        answer: "NITI Aayog"
-    },
-    {
-        question: "The Finance Commission is required to make recommendations to the president of India on all the following matters except:",
-        options: ["The distribution of net proceeds of taxes to be shared between the Centre and states.", "The principles that should govern the grant-in-aids to the states by the Centre.", "It also audits the receipts and expenditure from the consolidated fund of India and the state.", "Any other matter referred to it by the president in the interests of sound Finance."],
-        answer: "It also audits the receipts and expenditure from the consolidated fund of India and the state."
-    },
-    {
-        question: "Macroeconomics is also called ________ economics.",
-        options: ["Applied economics", "Aggregate Economics", "Experimental Economics", "None of the above"],
-        answer: "Aggregate Economics"
-    },
-    {
-        question: "In the conversation: Suresh: 'My corn harvest is poor.' Mukesh: 'Price increases will compensate.' Harish: 'Climate affects crop yields.' Swati: 'The Government ought to guarantee our income will not fall.' The normative statement is made by?",
-        options: ["Suresh", "Mukesh", "Harish", "Swati"],
-        answer: "Swati"
-    },
-    {
-        question: "Economics according to Lionel Robbins, is a",
-        options: ["Normative Science", "Applied Science", "Positive Science", "Experimental Science"],
-        answer: "Positive Science"
-    },
-    {
-        question: "Periods of less than full employment correspond to:",
-        options: ["Points outside the PPC", "Points inside the PPC", "Points on the PPC", "Either points inside or outside the PPC"],
-        answer: "Points inside the PPC"
-    },
-    {
-        question: "Which of the following statements is correct?",
-        options: ["In a two-good economy, the production possibilities frontier reflects the maximum amount of one good that can be produce when a given amount of other good is produced.", "Positive economics focuses on welfare of people of a society.", "Microeconomics is the study of the behavior of the economy as a whole.", "All are correct."],
-        answer: "In a two-good economy, the production possibilities frontier reflects the maximum amount of one good that can be produce when a given amount of other good is produced."
-    },
-    {
-        question: "Which of the following is a normative economic statement?",
-        options: ["Economics is a social science that studies human behavior.", "India spends a huge amount of money on national defense.", "The minimum wage should be raised to Rs. 500/- per day.", "Unemployment rate decrease with industrialization."],
-        answer: "The minimum wage should be raised to Rs. 500/- per day."
-    },
-    {
-        question: "What does an outward shift of the Production Possibility Curve (PPC) indicate?",
-        options: ["Inflation", "Economic Growth", "Over production", "Over employment production."],
-        answer: "Economic Growth"
-    },
-    {
-        question: "Which of the following is related to microeconomics?",
-        options: ["Inflation in economy.", "Problem of unemployment", "National Income", "Income from the railways."],
-        answer: "Income from the railways."
-    },
-    {
-        question: "Which of the following is a central problem of economics?",
-        options: ["What to Produce?", "How to produce?", "For whom to produce?", "All of the above"],
-        answer: "All of the above"
-    },
-    {
-        question: "The difference between positive and normative economics is:",
-        options: ["Positive Economics prescribes while normative economics describes.", "Normative Economics describes the facts of the economy while positive economics involves evaluating whether some of these are good or bad for the welfare of the people.", "Positive Economics explains the performance of the economy while normative economics finds out the reasons for poor performance.", "Positive Economics describes the facts of the economy while Normative economics involves evaluating whether some of these are good or bad for the welfare of the people."],
-        answer: "Positive Economics describes the facts of the economy while Normative economics involves evaluating whether some of these are good or bad for the welfare of the people."
-    },
-    {
-        question: "If the opportunity cost is constant, then PPC would be:",
-        options: ["Convex", "Straight line", "Backward bending", "Concave."],
-        answer: "Straight line"
-    },
-    {
-        question: "If a point falls outside the production possibility curve, what does it indicate?",
-        options: ["Resources are underutilized", "Resources are efficiently utilized", "It is an output combination that is not yet attainable", "None"],
-        answer: "It is an output combination that is not yet attainable"
-    },
-    {
-        question: "Expansion and Contraction of demand means:",
-        options: ["Movement to a higher demand curve", "Movement to a lower demand curve", "Movement along the same demand curve", "Both 1 and 2"],
-        answer: "Movement along the same demand curve"
-    },
-    {
-        question: "At the point above the middle of a straight-line demand curve, elasticity of demand is:",
-        options: [">1", "<1", "=1", "=0"],
-        answer: ">1"
-    },
-    {
-        question: "The supply curve shifts to the right because of:",
-        options: ["Improved technology", "Increased price of factors of production", "Increased excise duty", "All of the above"],
-        answer: "Improved technology"
-    },
-    {
-        question: "If regardless of change in its price, the quantity demanded of a commodity remains unchanged then the demand curve for the good will be:",
-        options: ["Horizontal", "Vertical", "Positively sloped", "Negatively Sloped"],
-        answer: "Vertical"
-    },
-    {
-        question: "If the quantity demanded of beef increases by 5% when the price of chicken increases by 25%, the cross-price elasticity of demand between beef and chicken is:",
-        options: ["0.2", "(-)0.2", "5", "(-) 5"],
-        answer: "0.2"
-    },
-    {
-        question: "When total demand for a commodity whose price has fallen increases, it is due to:",
-        options: ["Price Effect", "Substitute Effect", "Complementary Effect", "Income Effect."],
-        answer: "Price Effect"
-    },
-    {
-        question: "Giffen goods are those goods",
-        options: ["For which demand increases as price increases.", "Which have a high-income elasticity of demand", "Which are in short supplies.", "None of these"],
-        answer: "For which demand increases as price increases."
-    },
-    {
-        question: "Given the following four possibilities, which one results in an increase in total consumer expenditure?",
-        options: ["Demand is unitary elastic and price falls.", "Demand is elastic and price rises.", "Demand is inelastic and price falls.", "Demand is inelastic and price rises."],
-        answer: "Demand is inelastic and price rises."
-    },
-    {
-        question: "Total utility is maximum when:",
-        options: ["Marginal utility is at its highest point.", "Marginal Utility is equal to average utility.", "Average utility is maximum.", "Marginal Utility is zero."],
-        answer: "Marginal Utility is zero."
-    },
-    {
-        question: "If the demand is more than supply, then the pressure on price will be:",
-        options: ["Upward", "Downward", "Constant", "None of the above"],
-        answer: "Upward"
-    },
-    {
-        question: "Which of the following is a factor of production?",
-        options: ["Land", "Labour", "Capital", "All of these"],
-        answer: "All of these"
-    },
-    {
-        question: "Which of the following curve is a rectangular hyperbola?",
-        options: ["ATC", "AFC", "AVC", "MC"],
-        answer: "AFC"
-    },
-    {
-        question: "Economies of scale means:",
-        options: ["Reduction in unit cost of production", "Reductions in unit cost of distribution", "Addition to the unit cost of production", "Reduction in the total cost of production"],
-        answer: "Reduction in unit cost of production"
-    },
-    {
-        question: "Which of the following is an example of an 'explicit cost'?",
-        options: ["The payment of wages by the firm.", "The normal profit earned by the firm.", "The income that could have been earned in alternative uses by the resources owned by the firm.", "The wages a proprietor could have made by working as an employee of a large firm."],
-        answer: "The payment of wages by the firm."
-    },
-    {
-        question: "The 'law of diminishing returns' applies to:",
-        options: ["The short run, but not the long run.", "The long run, but not the short run.", "Both the short run and the long run.", "Neither short run nor the long run."],
-        answer: "The short run, but not the long run."
-    },
-    {
-        question: "Which of the following is a variable cost in the short run?",
-        options: ["Rent of the factory", "Wages paid to the factory labour.", "Interest payments on borrowed financial capital.", "Payment on the lease for factory equipment."],
-        answer: "Wages paid to the factory labour."
-    },
-    {
-        question: "Marginal cost is:",
-        options: ["Always less than the average cost.", "Always more than the average cost.", "Equal to average cost at its minimum point.", "Never equal to average cost."],
-        answer: "Equal to average cost at its minimum point."
-    },
-    {
-        question: "The vertical difference between TVC and TC is equal to:",
-        options: ["MC", "AVC", "TFC", "None of the above"],
-        answer: "TFC"
-    },
-    {
-        question: "Which of the following is not a classification of market on the basis of area?",
-        options: ["National Market", "International Market", "Capital Market", "Local Market"],
-        answer: "Capital Market"
-    },
-    {
-        question: "Which of the following is not a feature of Monopoly market?",
-        options: ["Single Seller of the product", "Market Power", "Freedom to Entry", "No close-substitutes available"],
-        answer: "Freedom to Entry"
-    },
-    {
-        question: "Group behavior exists in:",
-        options: ["Perfect Competition", "Monopoly", "Oligopoly", "All of them"],
-        answer: "Oligopoly"
-    },
-    {
-        question: "Which of the following is not a characteristic of Price-taker?",
-        options: ["TR = P x Q", "AR = Price", "Negatively sloped demand curve", "Marginal Revenue = Price"],
-        answer: "Negatively sloped demand curve"
-    },
-    {
-        question: "In the context of oligopoly, the kinked demand hypothesis is designed to explain:",
-        options: ["Price leadership", "Collusion among rivals", "Price rigidity", "Price and output determination"],
-        answer: "Price rigidity"
-    },
-    {
-        question: "A monopoly is a:",
-        options: ["Price-maker", "Price-taker", "Price-adjuster", "None of the above"],
-        answer: "Price-maker"
-    },
-    {
-        question: "Excess capacity is not found under:",
-        options: ["Monopoly", "Imperfect Competition", "Perfect Competition", "Monopsony"],
-        answer: "Perfect Competition"
-    },
-    {
-        question: "Which is the first order condition for the profit of a firm to be maximum?",
-        options: ["AC = AR", "AC = MR", "MR = AR", "MC = MR"],
-        answer: "MC = MR"
-    },
-    {
-        question: "Pure Oligopoly is based on the ________ products.",
-        options: ["Differentiated", "Homogeneous", "Unrelated", "None of the above"],
-        answer: "Homogeneous"
-    },
-    {
-        question: "The sale of branded articles is common in a situation of",
-        options: ["Monopoly", "Monopolistic Competition", "Pure Competition", "Excess capacity"],
-        answer: "Monopolistic Competition"
-    },
-    {
-        question: "PM Narendra Modi announced a UPI based app called BHIM. What does it stand for?",
-        options: ["Bharat Interface for Monetization", "Bharat Intersection for Money", "Bharat Interface for Money", "Bharat Ideas for Monetization"],
-        answer: "Bharat Interface for Money"
-    },
-    {
-        question: "Which of the followings is called National Income?",
-        options: ["NNP at Market Price", "NNP at Factor Cost", "GNP at Market Price", "GNP at Factor Cost"],
-        answer: "NNP at Factor Cost"
-    },
-    {
-        question: "Which of the following is a cause of high birth rate in India?",
-        options: ["Predominance of Agriculture", "Slow urbanization", "Early Marriage", "All the above"],
-        answer: "All the above"
-    },
-    {
-        question: "The Standup India scheme support entrepreneurship among ____________.",
-        options: ["SC Community", "Women", "ST Community", "All the above."],
-        answer: "All the above."
-    },
-    {
-        question: "Unemployment rate in India is defined as the ratio of number of persons unemployed to total:",
-        options: ["Population excluding children", "Population excluding the aged", "Population", "Labor Force"],
-        answer: "Labor Force"
-    },
-    {
-        question: "Atal Pension Yojana is a government-backed pension scheme in India targeted at the ____________.",
-        options: ["Organized Sector", "Unorganized Sector", "NPS Account Holders", "None of the above"],
-        answer: "Unorganized Sector"
-    },
-    {
-        question: "Product method of calculating national income is also known as ________.",
-        options: ["Income method", "Value added method", "Expenditure Method", "Distribution Method"],
-        answer: "Value added method"
-    },
-    {
-        question: "Which of the following is not an example of Direct Tax?",
-        options: ["Corporation Tax", "Property Tax", "Service Tax", "Gift Tax"],
-        answer: "Service Tax"
-    },
-    {
-        question: "In India, the first Five Year Plan was introduced in __________.",
-        options: ["January 1955", "April 1951", "April 1950", "January 1951"],
-        answer: "April 1951"
-    },
-    {
-        question: "Which of the following is not a World Bank Group Agency?",
-        options: ["IBRD", "IFC", "IDA", "IMF"],
-        answer: "IMF"
-    },
-    {
-        question: "Relaxation of government restrictions in area of economic policies is called:",
-        options: ["Liberalization", "Privatization", "Globalization", "None"],
-        answer: "Liberalization"
-    },
-    {
-        question: "The latest member of WTO is: (As of July 2016)",
-        options: ["Liberia", "Yemen", "Afghanistan", "Laos"],
-        answer: "Afghanistan"
-    },
-    {
-        question: "Which of the following statement is incorrect? To combat Deflation RBI should:",
-        options: ["Follow Easy/Cheap money policy", "Buy Government securities in OMO", "CRR Should be decreased", "SLR should be increased"],
-        answer: "SLR should be increased"
-    },
-    {
-        question: "Which of the following is not a RBI’s qualitative credit control method of money supply?",
-        options: ["Margin requirements", "Consumer Credit regulation", "SLR", "Direct Action"],
-        answer: "SLR"
-    },
-    {
-        question: "Which of the following is a primary function of Money?",
-        options: ["Medium of Exchange", "Transfer of Value", "Both 1 and 2", "None"],
-        answer: "Medium of Exchange"
-    },
-    {
-        question: "Which of the followings is not a Demand Liability for a commercial Bank?",
-        options: ["Current Account", "Saving Account", "Demand Draft", "Staff Security Deposits"],
-        answer: "Staff Security Deposits"
-    },
-    {
-        question: "M1+Net time deposit of bank is referred to:",
-        options: ["M2", "M3", "M4", "M0"],
-        answer: "M3"
-    },
-    {
-        question: "Deflation is:",
-        options: ["A situation of falling prices", "A situation of rising prices", "A situation of constant prices", "None of these"],
-        answer: "A situation of falling prices"
-    },
-    {
-        question: "Who sign one rupee note in India?",
-        options: ["RBI Governor", "Finance Minister", "SBI Chairman", "Finance Secretary"],
-        answer: "Finance Secretary"
-    },
-    {
-        question: "Which of the following is not a part of Foreign Exchange Reserve of India?",
-        options: ["Foreign Currency Assets", "Silver", "Special Drawing Rights (SDRs)", "Reserve Tranche Position in the IMF"],
-        answer: "Silver"
-    },
-    {
-        question: "Which of the following statements regarding e-NAM is correct?",
-        options: ["e-NAM stands for: Electronic National Agriculture Market", "It is a Pan-India electronic trading portal which networks the existing APMC mandis", "It is connected to a physical market (mandi) at the back end", "All are correct."],
-        answer: "All are correct."
-    },
-    {
-        question: "In the term JAM, the letter ‘A’ stands for:",
-        options: ["Authentication", "Advertisement", "Aadhaar", "Acceleration"],
-        answer: "Aadhaar"
-    },
+    { question: "Who appoints the CAG of India?", options: ["Chief Justice of India", "Prime Minister of India", "President of India", "Vice-President of India"], answer: "President of India" },
+    { question: "Comptroller and Auditor General of India acts as a Friend, Philosopher and Guide for:", options: ["Finance Ministry", "Finance Commission", "PAC", "Prime Minister"], answer: "PAC" },
+    { question: "Who is the present CAG of India? (As of Oct 2017)", options: ["Shashi Kant Sharma", "Rajiv Mehrishi", "Vinod Rai", "V. Narahari Rao"], answer: "Rajiv Mehrishi" },
+    { question: "Which of the following statements is correct regarding the CAG?", options: ["The CAG is an agent of the Parliament and conducts audit of expenditure on behalf of the Parliament.", "CAG holds office for a period of five years or up to the age of 65 years.", "CAG submits his audit reports relating to the accounts of state to the President.", "All are correct."], answer: "The CAG is an agent of the Parliament and conducts audit of expenditure on behalf of the Parliament." },
+    { question: "As per which article of the Indian Constitution, 'The accounts of the Union and of the States shall be kept in such form as the President may, on the advice of the Comptroller and Auditor-General of India, prescribe.'?", options: ["148", "149", "150", "280"], answer: "150" },
+    { question: "Who among the following was the first CAG of India?", options: ["V. Narahari Rao", "Vinod Rai", "Shashikant Sharma", "K.C. Neogy."], answer: "V. Narahari Rao" },
+    { question: "The tenure of CAG is:", options: ["5 Years", "3 Years or 60 Years of age, whichever is earlier", "6 Years", "6 Years or 65 Years of age, whichever is earlier."], answer: "6 Years or 65 Years of age, whichever is earlier." },
+    { question: "According to which article of the Constitution of India does the 'CAG of India ascertains and certifies the net proceeds of any tax or duty. His certification is final.'?", options: ["Article 148", "Article 280", "Article 279", "Article 149"], answer: "Article 279" },
+    { question: "Which one of the following variables was not used by the Fourteenth Finance Commission for Horizontal devolution of money to the states?", options: ["Income Distance", "Area", "Population Census 1971", "Literacy Rate"], answer: "Literacy Rate" },
+    { question: "Which of the following states got the highest share in taxes by the 14th Finance Commission recommendation?", options: ["J&K", "Uttar Pradesh", "Bihar", "Maharashtra"], answer: "Uttar Pradesh" },
+    { question: "Which of the following roles/functions/responsibilities are NOT under the purview of the Finance commission?", options: ["Sharing of net proceeds of taxes between the Center and States.", "Recommending principles for governing the grants-in-aid to the states by the Center.", "Preparation and periodical revision of electoral rolls.", "Recommendations on matters referred to it by the President for the interest of sound finance."], answer: "Preparation and periodical revision of electoral rolls." },
+    { question: "The Constitution of India envisages the ________ as the balancing wheel of fiscal federalism in India.", options: ["CAG", "Finance commission", "NITI AAYOG", "RBI"], answer: "Finance commission" },
+    { question: "Article ________ of the Indian Constitution provides for a Finance Commission as a quasi-judicial body.", options: ["280", "281", "275", "None of the above."], answer: "280" },
+    { question: "Who was the chairman of Fourteenth Finance Commission?", options: ["Y.V. Reddy", "Dr. Vijay Kelkar", "Dr. C. Rangrajan", "Dr. K.C. Neogy"], answer: "Y.V. Reddy" },
+    { question: "The Fourteenth Finance Commission has recommended states' share in net proceeds of tax revenues be ________ per cent, a huge jump from the ________ per cent recommend by the 13th Finance Commission.", options: ["50, 40", "45, 35", "40, 15", "42, 32"], answer: "42, 32" },
+    { question: "Who among the following is considered 'The Guardian of Public Purse' in India:", options: ["Finance Commission", "NITI Aayog", "CAG", "RBI"], answer: "CAG" },
+    { question: "Which of the following is not a constitutional body?", options: ["Finance Commission", "CAG", "Election Commission", "NITI Aayog"], answer: "NITI Aayog" },
+    { question: "The Finance Commission is required to make recommendations to the president of India on all the following matters except:", options: ["The distribution of net proceeds of taxes to be shared between the Centre and states.", "The principles that should govern the grant-in-aids to the states by the Centre.", "It also audits the receipts and expenditure from the consolidated fund of India and the state.", "Any other matter referred to it by the president in the interests of sound Finance."], answer: "It also audits the receipts and expenditure from the consolidated fund of India and the state." },
+    { question: "Macroeconomics is also called ________ economics.", options: ["Applied economics", "Aggregate Economics", "Experimental Economics", "None of the above"], answer: "Aggregate Economics" },
+    { question: "In the conversation: Suresh: 'My corn harvest is poor.' Mukesh: 'Price increases will compensate.' Harish: 'Climate affects crop yields.' Swati: 'The Government ought to guarantee our income will not fall.' The normative statement is made by?", options: ["Suresh", "Mukesh", "Harish", "Swati"], answer: "Swati" },
+    { question: "Economics according to Lionel Robbins, is a", options: ["Normative Science", "Applied Science", "Positive Science", "Experimental Science"], answer: "Positive Science" },
+    { question: "Periods of less than full employment correspond to:", options: ["Points outside the PPC", "Points inside the PPC", "Points on the PPC", "Either points inside or outside the PPC"], answer: "Points inside the PPC" },
+    { question: "Which of the following statements is correct?", options: ["In a two-good economy, the production possibilities frontier reflects the maximum amount of one good that can be produce when a given amount of other good is produced.", "Positive economics focuses on welfare of people of a society.", "Microeconomics is the study of the behavior of the economy as a whole.", "All are correct."], answer: "In a two-good economy, the production possibilities frontier reflects the maximum amount of one good that can be produce when a given amount of other good is produced." },
+    { question: "Which of the following is a normative economic statement?", options: ["Economics is a social science that studies human behavior.", "India spends a huge amount of money on national defense.", "The minimum wage should be raised to Rs. 500/- per day.", "Unemployment rate decrease with industrialization."], answer: "The minimum wage should be raised to Rs. 500/- per day." },
+    { question: "What does an outward shift of the Production Possibility Curve (PPC) indicate?", options: ["Inflation", "Economic Growth", "Over production", "Over employment production."], answer: "Economic Growth" },
+    { question: "Which of the following is related to microeconomics?", options: ["Inflation in economy.", "Problem of unemployment", "National Income", "Income from the railways."], answer: "Income from the railways." },
+    { question: "Which of the following is a central problem of economics?", options: ["What to Produce?", "How to produce?", "For whom to produce?", "All of the above"], answer: "All of the above" },
+    { question: "The difference between positive and normative economics is:", options: ["Positive Economics prescribes while normative economics describes.", "Normative Economics describes the facts of the economy while positive economics involves evaluating whether some of these are good or bad for the welfare of the people.", "Positive Economics explains the performance of the economy while normative economics finds out the reasons for poor performance.", "Positive Economics describes the facts of the economy while Normative economics involves evaluating whether some of these are good or bad for the welfare of the people."], answer: "Positive Economics describes the facts of the economy while Normative economics involves evaluating whether some of these are good or bad for the welfare of the people." },
+    { question: "If the opportunity cost is constant, then PPC would be:", options: ["Convex", "Straight line", "Backward bending", "Concave."], answer: "Straight line" },
+    { question: "If a point falls outside the production possibility curve, what does it indicate?", options: ["Resources are underutilized", "Resources are efficiently utilized", "It is an output combination that is not yet attainable", "None"], answer: "It is an output combination that is not yet attainable" },
+    { question: "Expansion and Contraction of demand means:", options: ["Movement to a higher demand curve", "Movement to a lower demand curve", "Movement along the same demand curve", "Both 1 and 2"], answer: "Movement along the same demand curve" },
+    { question: "At the point above the middle of a straight-line demand curve, elasticity of demand is:", options: [">1", "<1", "=1", "=0"], answer: ">1" },
+    { question: "The supply curve shifts to the right because of:", options: ["Improved technology", "Increased price of factors of production", "Increased excise duty", "All of the above"], answer: "Improved technology" },
+    { question: "If regardless of change in its price, the quantity demanded of a commodity remains unchanged then the demand curve for the good will be:", options: ["Horizontal", "Vertical", "Positively sloped", "Negatively Sloped"], answer: "Vertical" },
+    { question: "If the quantity demanded of beef increases by 5% when the price of chicken increases by 25%, the cross-price elasticity of demand between beef and chicken is:", options: ["0.2", "(-)0.2", "5", "(-) 5"], answer: "0.2" },
+    { question: "When total demand for a commodity whose price has fallen increases, it is due to:", options: ["Price Effect", "Substitute Effect", "Complementary Effect", "Income Effect."], answer: "Price Effect" },
+    { question: "Giffen goods are those goods", options: ["For which demand increases as price increases.", "Which have a high-income elasticity of demand", "Which are in short supplies.", "None of these"], answer: "For which demand increases as price increases." },
+    { question: "Given the following four possibilities, which one results in an increase in total consumer expenditure?", options: ["Demand is unitary elastic and price falls.", "Demand is elastic and price rises.", "Demand is inelastic and price falls.", "Demand is inelastic and price rises."], answer: "Demand is inelastic and price rises." },
+    { question: "Total utility is maximum when:", options: ["Marginal utility is at its highest point.", "Marginal Utility is equal to average utility.", "Average utility is maximum.", "Marginal Utility is zero."], answer: "Marginal Utility is zero." },
+    { question: "If the demand is more than supply, then the pressure on price will be:", options: ["Upward", "Downward", "Constant", "None of the above"], answer: "Upward" },
+    { question: "Which of the following is a factor of production?", options: ["Land", "Labour", "Capital", "All of these"], answer: "All of these" },
+    { question: "Which of the following curve is a rectangular hyperbola?", options: ["ATC", "AFC", "AVC", "MC"], answer: "AFC" },
+    { question: "Economies of scale means:", options: ["Reduction in unit cost of production", "Reductions in unit cost of distribution", "Addition to the unit cost of production", "Reduction in the total cost of production"], answer: "Reduction in unit cost of production" },
+    { question: "Which of the following is an example of an 'explicit cost'?", options: ["The payment of wages by the firm.", "The normal profit earned by the firm.", "The income that could have been earned in alternative uses by the resources owned by the firm.", "The wages a proprietor could have made by working as an employee of a large firm."], answer: "The payment of wages by the firm." },
+    { question: "The 'law of diminishing returns' applies to:", options: ["The short run, but not the long run.", "The long run, but not the short run.", "Both the short run and the long run.", "Neither short run nor the long run."], answer: "The short run, but not the long run." },
+    { question: "Which of the following is a variable cost in the short run?", options: ["Rent of the factory", "Wages paid to the factory labour.", "Interest payments on borrowed financial capital.", "Payment on the lease for factory equipment."], answer: "Wages paid to the factory labour." },
+    { question: "Marginal cost is:", options: ["Always less than the average cost.", "Always more than the average cost.", "Equal to average cost at its minimum point.", "Never equal to average cost."], answer: "Equal to average cost at its minimum point." },
+    { question: "The vertical difference between TVC and TC is equal to:", options: ["MC", "AVC", "TFC", "None of the above"], answer: "TFC" },
+    { question: "Which of the following is not a classification of market on the basis of area?", options: ["National Market", "International Market", "Capital Market", "Local Market"], answer: "Capital Market" },
+    { question: "Which of the following is not a feature of Monopoly market?", options: ["Single Seller of the product", "Market Power", "Freedom to Entry", "No close-substitutes available"], answer: "Freedom to Entry" },
+    { question: "Group behavior exists in:", options: ["Perfect Competition", "Monopoly", "Oligopoly", "All of them"], answer: "Oligopoly" },
+    { question: "Which of the following is not a characteristic of Price-taker?", options: ["TR = P x Q", "AR = Price", "Negatively sloped demand curve", "Marginal Revenue = Price"], answer: "Negatively sloped demand curve" },
+    { question: "In the context of oligopoly, the kinked demand hypothesis is designed to explain:", options: ["Price leadership", "Collusion among rivals", "Price rigidity", "Price and output determination"], answer: "Price rigidity" },
+    { question: "A monopoly is a:", options: ["Price-maker", "Price-taker", "Price-adjuster", "None of the above"], answer: "Price-maker" },
+    { question: "Excess capacity is not found under:", options: ["Monopoly", "Imperfect Competition", "Perfect Competition", "Monopsony"], answer: "Perfect Competition" },
+    { question: "Which is the first order condition for the profit of a firm to be maximum?", options: ["AC = AR", "AC = MR", "MR = AR", "MC = MR"], answer: "MC = MR" },
+    { question: "Pure Oligopoly is based on the ________ products.", options: ["Differentiated", "Homogeneous", "Unrelated", "None of the above"], answer: "Homogeneous" },
+    { question: "The sale of branded articles is common in a situation of", options: ["Monopoly", "Monopolistic Competition", "Pure Competition", "Excess capacity"], answer: "Monopolistic Competition" },
+    { question: "PM Narendra Modi announced a UPI based app called BHIM. What does it stand for?", options: ["Bharat Interface for Monetization", "Bharat Intersection for Money", "Bharat Interface for Money", "Bharat Ideas for Monetization"], answer: "Bharat Interface for Money" },
+    { question: "Which of the followings is called National Income?", options: ["NNP at Market Price", "NNP at Factor Cost", "GNP at Market Price", "GNP at Factor Cost"], answer: "NNP at Factor Cost" },
+    { question: "Which of the following is a cause of high birth rate in India?", options: ["Predominance of Agriculture", "Slow urbanization", "Early Marriage", "All the above"], answer: "All the above" },
+    { question: "The Standup India scheme support entrepreneurship among ____________.", options: ["SC Community", "Women", "ST Community", "All the above."], answer: "All the above." },
+    { question: "Unemployment rate in India is defined as the ratio of number of persons unemployed to total:", options: ["Population excluding children", "Population excluding the aged", "Population", "Labor Force"], answer: "Labor Force" },
+    { question: "Atal Pension Yojana is a government-backed pension scheme in India targeted at the ____________.", options: ["Organized Sector", "Unorganized Sector", "NPS Account Holders", "None of the above"], answer: "Unorganized Sector" },
+    { question: "Product method of calculating national income is also known as ________.", options: ["Income method", "Value added method", "Expenditure Method", "Distribution Method"], answer: "Value added method" },
+    { question: "Which of the following is not an example of Direct Tax?", options: ["Corporation Tax", "Property Tax", "Service Tax", "Gift Tax"], answer: "Service Tax" },
+    { question: "In India, the first Five Year Plan was introduced in __________.", options: ["January 1955", "April 1951", "April 1950", "January 1951"], answer: "April 1951" },
+    { question: "Which of the following is not a World Bank Group Agency?", options: ["IBRD", "IFC", "IDA", "IMF"], answer: "IMF" },
+    { question: "Relaxation of government restrictions in area of economic policies is called:", options: ["Liberalization", "Privatization", "Globalization", "None"], answer: "Liberalization" },
+    { question: "The latest member of WTO is: (As of July 2016)", options: ["Liberia", "Yemen", "Afghanistan", "Laos"], answer: "Afghanistan" },
+    { question: "Which of the following statement is incorrect? To combat Deflation RBI should:", options: ["Follow Easy/Cheap money policy", "Buy Government securities in OMO", "CRR Should be decreased", "SLR should be increased"], answer: "SLR should be increased" },
+    { question: "Which of the following is not a RBI’s qualitative credit control method of money supply?", options: ["Margin requirements", "Consumer Credit regulation", "SLR", "Direct Action"], answer: "SLR" },
+    { question: "Which of the following is a primary function of Money?", options: ["Medium of Exchange", "Transfer of Value", "Both 1 and 2", "None"], answer: "Medium of Exchange" },
+    { question: "Which of the followings is not a Demand Liability for a commercial Bank?", options: ["Current Account", "Saving Account", "Demand Draft", "Staff Security Deposits"], answer: "Staff Security Deposits" },
+    { question: "M1+Net time deposit of bank is referred to:", options: ["M2", "M3", "M4", "M0"], answer: "M3" },
+    { question: "Deflation is:", options: ["A situation of falling prices", "A situation of rising prices", "A situation of constant prices", "None of these"], answer: "A situation of falling prices" },
+    { question: "Who sign one rupee note in India?", options: ["RBI Governor", "Finance Minister", "SBI Chairman", "Finance Secretary"], answer: "Finance Secretary" },
+    { question: "Which of the following is not a part of Foreign Exchange Reserve of India?", options: ["Foreign Currency Assets", "Silver", "Special Drawing Rights (SDRs)", "Reserve Tranche Position in the IMF"], answer: "Silver" },
+    { question: "Which of the following statements regarding e-NAM is correct?", options: ["e-NAM stands for: Electronic National Agriculture Market", "It is a Pan-India electronic trading portal which networks the existing APMC mandis", "It is connected to a physical market (mandi) at the back end", "All are correct."], answer: "All are correct." },
+    { question: "In the term JAM, the letter ‘A’ stands for:", options: ["Authentication", "Advertisement", "Aadhaar", "Acceleration"], answer: "Aadhaar" },
     // Accountancy Questions
-    {
-        question: "All the following statements are objectives of accounting except",
-        options: ["Providing information about the performance of business entity.", "Providing details about the personal assets and liabilities of the owner.", "Maintaining records of business.", "Providing information about the assets, liabilities and capital of business entity."],
-        answer: "Providing details about the personal assets and liabilities of the owner."
-    },
-    {
-        question: "Which of the following is correct?",
-        options: ["Liabilities is equal to capital plus assets", "Capital is equal to assets minus liabilities", "Assets is equal to liabilities minus capital", "Capital is equal to assets plus liabilities"],
-        answer: "Capital is equal to assets minus liabilities"
-    },
-    {
-        question: "Which of the following statements is incorrect?",
-        options: ["Financial statements are part of Accounting.", "Capital Account is a liability of the business.", "Returns Inwards implies purchase returns.", "Credit means increase in liability and decrease in asset."],
-        answer: "Returns Inwards implies purchase returns."
-    },
-    {
-        question: "Financial statements do not consider:",
-        options: ["Assets expressed in monetary terms.", "Liabilities expressed in monetary terms.", "Assets and Liabilities expressed in non-monetary terms.", "None of the above."],
-        answer: "Assets and Liabilities expressed in non-monetary terms."
-    },
-    {
-        question: "Which of the following is a function of accounting?",
-        options: ["Recording of financial transaction.", "Classifying of financial data.", "Summarizing of financial data.", "All of the above."],
-        answer: "All of the above."
-    },
-    {
-        question: "Transactions between owner and business are recorded as per",
-        options: ["Going concern concept", "Periodicity concept", "Prudence concept", "None of these"],
-        answer: "None of these"
-    },
-    {
-        question: "'Assets should be valued at the price paid to acquire them' is based on:",
-        options: ["Realization concept.", "Cost concept.", "Accrual concept.", "Money measurement concept."],
-        answer: "Cost concept."
-    },
-    {
-        question: "The concept of conservatism when applied to the balance sheet results in:",
-        options: ["Overstatement of assets.", "Overstatement of capital", "Understatement of assets", "None of the above."],
-        answer: "Understatement of assets"
-    },
-    {
-        question: "Omission of paise and showing the round figures in financial statements is based on:",
-        options: ["Realization concept", "Materiality concept", "Consistency concept", "Conservatism concept"],
-        answer: "Materiality concept"
-    },
-    {
-        question: "The determination of expenses for an accounting period is based on the concept of:",
-        options: ["Objectivity", "Matching", "Materiality", "Periodicity"],
-        answer: "Matching"
-    },
-    {
-        question: "Which of the following is an incorrect match?",
-        options: ["AS 28: Impairment of Assets", "AS 29: Provisions, Contingent Asset Liabilities & Contingent Assets", "AS 20: Earning Per Share", "AS 9: Property, Plant and Equipment"],
-        answer: "AS 9: Property, Plant and Equipment"
-    },
-    {
-        question: "In accounting ‘GAAP’ stands for:",
-        options: ["General Annual Accounting Principles", "General Accepted Accounting Practices", "Generally Accepted Accounting Principle", "None of the above"],
-        answer: "Generally Accepted Accounting Principle"
-    },
-    {
-        question: "Change in the method of depreciation is a change in __________.",
-        options: ["Measurement discipline", "Accounting policy.", "Accounting estimate.", "All of these."],
-        answer: "Accounting policy."
-    },
-    {
-        question: "The system of recording transactions based on dual aspect concept is called?",
-        options: ["Double Account System", "Double Entry System", "Single Entry System", "None of the above."],
-        answer: "Double Entry System"
-    },
-    {
-        question: "Which of the followings are the ‘Fundamental Accounting Assumptions’?",
-        options: ["Going Concern, Entity, Periodicity", "Going Concern, Conservatism & Accrual", "Going concern, Consistency and Accrual", "Going Concern, Matching and consistency"],
-        answer: "Going concern, Consistency and Accrual"
-    },
-    {
-        question: "Material costing Rs. 700 in the erection of the machinery and the wages paid for it amounting to Rs. 400 should be debited to:",
-        options: ["Wages account.", "Machinery account.", "Purchases account.", "Material account."],
-        answer: "Machinery account."
-    },
-    {
-        question: "Bank account is a _____.",
-        options: ["Real Account", "Personal Account", "Nominal Account", "None of these"],
-        answer: "Personal Account"
-    },
-    {
-        question: "Goods given as samples should be credited to:",
-        options: ["Purchase Account", "Sales Account", "Advertisement Account", "None of the above."],
-        answer: "Purchase Account"
-    },
-    {
-        question: "A sale of goods to Ramesh for cash should be debited to:",
-        options: ["Ramesh", "Cash", "Sales", "None of the above"],
-        answer: "Cash"
-    },
-    {
-        question: "Goods worth Rs. 5,000/- taken by proprietor for domestic use should be credited to:",
-        options: ["Sales Account", "Proprietor’s personal expenses.", "Purchase account.", "Purchase return account."],
-        answer: "Purchase account."
-    },
-    {
-        question: "Credit balances in the ledger will be:",
-        options: ["A revenue or an asset", "An expense or on asset", "A revenue or a liability", "None of the three"],
-        answer: "A revenue or a liability"
-    },
-    {
-        question: "Journal is a Book of _____ entry, while Ledger is a book of ____ entry.",
-        options: ["First, Second", "Second, First", "Primary, Smart", "Final, Primary"],
-        answer: "First, Second"
-    },
-    {
-        question: "Ledger book is popularly known as;",
-        options: ["Secondary book of accounts", "Principal book of accounts", "Subsidiary book of accounts", "Tertiary book of account entry."],
-        answer: "Principal book of accounts"
-    },
-    {
-        question: "Trial balance is a statement which shows the ________ or the ________of all the accounts.",
-        options: ["Posted balances, Total of balances.", "Opening balances, Closing balances.", "Debit balance, Credit balance.", "Balances, Entries."],
-        answer: "Debit balance, Credit balance."
-    },
-    {
-        question: "Which of the following is known as the base for preparing trial balance?",
-        options: ["Journal", "Cash Account", "Ledger", "Balance Sheet"],
-        answer: "Ledger"
-    },
-    {
-        question: "Total of purchase return book is posted periodically to the credit of _______.",
-        options: ["Purchase return account", "Cash Book", "Journal proper", "None of the three"],
-        answer: "Purchase return account"
-    },
-    {
-        question: "Purchase of fixed assets on credit basis is recorded in:",
-        options: ["Purchase Book", "Cash Book", "Journal Proper", "None of the above"],
-        answer: "Journal Proper"
-    },
-    {
-        question: "Where two aspects of a transaction are posted in the Cash Book, such an entry is called:",
-        options: ["Credit Entry", "Debit Entry", "Contra Entry", "Double Entry"],
-        answer: "Contra Entry"
-    },
-    {
-        question: "Which of the following is not a type of cash book?",
-        options: ["Five column cash book", "Three column cash book", "Two column cash book", "Simple cash book"],
-        answer: "Five column cash book"
-    },
-    {
-        question: "Rs. 35,000 was spent on painting the new factory. It is a ________.",
-        options: ["Capital expenditure", "Revenue expenditure", "Deferred revenue expenditure", "None of the above"],
-        answer: "Capital expenditure"
-    },
-    {
-        question: "Which account is the odd one out?",
-        options: ["Vehicle for office use.", "Office furniture & Equipment", "Freehold land and Building", "Inventory of material"],
-        answer: "Inventory of material"
-    },
-    {
-        question: "Cost of goods purchased for resale is an example of:",
-        options: ["Deferred Revenue Expenditure", "Revenue Expenditure", "Capital Expenditure", "None of the above"],
-        answer: "Revenue Expenditure"
-    },
-    {
-        question: "Municipal tax Rs. 70,000 under dispute is a:",
-        options: ["Current liability", "Contingent liability", "Revenue loss", "None of the above."],
-        answer: "Contingent liability"
-    },
-    {
-        question: "Present liability of uncertain amount, which can be measured reliably by using substantial degree of estimation is termed as ____________.",
-        options: ["Provision.", "Liability", "Contingent liability", "Contingent asset"],
-        answer: "Provision."
-    },
-    {
-        question: "Errors of commission do not permit:",
-        options: ["Trial balance to agree", "Incorrect totaling of the Balance sheet", "Incorrect totaling of the trial balance", "None of the above"],
-        answer: "Trial balance to agree"
-    },
-    {
-        question: "Rectification entries are first recorded in ______________.",
-        options: ["Trial Balance", "Journal Proper", "Subsidiary Book", "Ledger"],
-        answer: "Journal Proper"
-    },
-    {
-        question: "When preparing a Bank reconciliation statement, if you start with balance as per cash book, then dividends directly collected by bank but not yet entered in cash book within the period are _________.",
-        options: ["Added", "Not required to be adjusted", "Deducted", "None of the above"],
-        answer: "Added"
-    },
-    {
-        question: "A BRS is a part of:",
-        options: ["Part of accounting reports", "Bank Account", "Cash Book", "None of the above"],
-        answer: "None of the above"
-    },
-    {
-        question: "Credit balance in the bank Pass Book represents _____ for the account holder.",
-        options: ["Liability", "Asset", "Reserve", "Provision"],
-        answer: "Asset"
-    },
-    {
-        question: "“Inventories should be out of godown in the sequence in which they arrive” is based on:",
-        options: ["Weighted average.", "LIFO", "FIFO", "HIFO"],
-        answer: "FIFO"
-    },
-    {
-        question: "Which of the following methods does not consider historical cost of inventory?",
-        options: ["Weighted Average", "FIFO", "Retail Price method", "All of the above."],
-        answer: "Retail Price method"
-    },
-    {
-        question: "The system which gives a continuous information regarding quantum and value of inventory is known as:",
-        options: ["Continuous stock-taking", "Periodic inventory", "Perpetual inventory", "None of the above"],
-        answer: "Perpetual inventory"
-    },
-    {
-        question: "The term depletion is used for:",
-        options: ["Fixed Assets", "Natural resources", "Intangible Assets", "All of these"],
-        answer: "Natural resources"
-    },
-    {
-        question: "Depreciation starts on a machine from the date:",
-        options: ["It is installed", "It is purchased", "It is put to use", "None of above."],
-        answer: "It is put to use"
-    },
-    {
-        question: "The expired portion of capital expenditure is shown in the financial statements as:",
-        options: ["As a liability.", "As an expense.", "As an income.", "As an asset."],
-        answer: "As an expense."
-    },
-    {
-        question: "Gross profit is the difference between",
-        options: ["Sales and purchases", "Sales and cost of sales", "Sales and total expenses", "None of the three"],
-        answer: "Sales and cost of sales"
-    },
-    {
-        question: "A promissory note is drawn by _______ in favour of _______.",
-        options: ["Drawer, Drawee.", "Drawer, Payee.", "Maker, Payee.", "Payer, Payee."],
-        answer: "Maker, Payee."
-    },
-    {
-        question: "Liability for the drawer for the bill discounted is a:",
-        options: ["Contingent liability", "Long term liability", "Short term liability", "Current liability"],
-        answer: "Contingent liability"
-    },
-    {
-        question: "Which of the following is correct?",
-        options: ["Sectional Balancing: A system where only one section or a group of Ledger can be balanced.", "Self-balancing: A system where each group of Ledger can be balanced.", "Transfer entry: An entry required for transferring and account from one ledger to another.", "All are correct."],
-        answer: "All are correct."
-    },
-    {
-        question: "Which of the following is not included in the final accounts of an Non-Profit Making Organization?",
-        options: ["Receipts and Payments Account", "Income and Expenditure Account", "Balance Sheet", "All are included."],
-        answer: "All are included."
-    }
+    { question: "All the following statements are objectives of accounting except", options: ["Providing information about the performance of business entity.", "Providing details about the personal assets and liabilities of the owner.", "Maintaining records of business.", "Providing information about the assets, liabilities and capital of business entity."], answer: "Providing details about the personal assets and liabilities of the owner." },
+    { question: "Which of the following is correct?", options: ["Liabilities is equal to capital plus assets", "Capital is equal to assets minus liabilities", "Assets is equal to liabilities minus capital", "Capital is equal to assets plus liabilities"], answer: "Capital is equal to assets minus liabilities" },
+    { question: "Which of the following statements is incorrect?", options: ["Financial statements are part of Accounting.", "Capital Account is a liability of the business.", "Returns Inwards implies purchase returns.", "Credit means increase in liability and decrease in asset."], answer: "Returns Inwards implies purchase returns." },
+    { question: "Financial statements do not consider:", options: ["Assets expressed in monetary terms.", "Liabilities expressed in monetary terms.", "Assets and Liabilities expressed in non-monetary terms.", "None of the above."], answer: "Assets and Liabilities expressed in non-monetary terms." },
+    { question: "Which of the following is a function of accounting?", options: ["Recording of financial transaction.", "Classifying of financial data.", "Summarizing of financial data.", "All of the above."], answer: "All of the above." },
+    { question: "Transactions between owner and business are recorded as per", options: ["Going concern concept", "Periodicity concept", "Prudence concept", "None of these"], answer: "None of these" },
+    { question: "'Assets should be valued at the price paid to acquire them' is based on:", options: ["Realization concept.", "Cost concept.", "Accrual concept.", "Money measurement concept."], answer: "Cost concept." },
+    { question: "The concept of conservatism when applied to the balance sheet results in:", options: ["Overstatement of assets.", "Overstatement of capital", "Understatement of assets", "None of the above."], answer: "Understatement of assets" },
+    { question: "Omission of paise and showing the round figures in financial statements is based on:", options: ["Realization concept", "Materiality concept", "Consistency concept", "Conservatism concept"], answer: "Materiality concept" },
+    { question: "The determination of expenses for an accounting period is based on the concept of:", options: ["Objectivity", "Matching", "Materiality", "Periodicity"], answer: "Matching" },
+    { question: "Which of the following is an incorrect match?", options: ["AS 28: Impairment of Assets", "AS 29: Provisions, Contingent Asset Liabilities & Contingent Assets", "AS 20: Earning Per Share", "AS 9: Property, Plant and Equipment"], answer: "AS 9: Property, Plant and Equipment" },
+    { question: "In accounting ‘GAAP’ stands for:", options: ["General Annual Accounting Principles", "General Accepted Accounting Practices", "Generally Accepted Accounting Principle", "None of the above"], answer: "Generally Accepted Accounting Principle" },
+    { question: "Change in the method of depreciation is a change in __________.", options: ["Measurement discipline", "Accounting policy.", "Accounting estimate.", "All of these."], answer: "Accounting policy." },
+    { question: "The system of recording transactions based on dual aspect concept is called?", options: ["Double Account System", "Double Entry System", "Single Entry System", "None of the above."], answer: "Double Entry System" },
+    { question: "Which of the followings are the ‘Fundamental Accounting Assumptions’?", options: ["Going Concern, Entity, Periodicity", "Going Concern, Conservatism & Accrual", "Going concern, Consistency and Accrual", "Going Concern, Matching and consistency"], answer: "Going concern, Consistency and Accrual" },
+    { question: "Material costing Rs. 700 in the erection of the machinery and the wages paid for it amounting to Rs. 400 should be debited to:", options: ["Wages account.", "Machinery account.", "Purchases account.", "Material account."], answer: "Machinery account." },
+    { question: "Bank account is a _____.", options: ["Real Account", "Personal Account", "Nominal Account", "None of these"], answer: "Personal Account" },
+    { question: "Goods given as samples should be credited to:", options: ["Purchase Account", "Sales Account", "Advertisement Account", "None of the above."], answer: "Purchase Account" },
+    { question: "A sale of goods to Ramesh for cash should be debited to:", options: ["Ramesh", "Cash", "Sales", "None of the above"], answer: "Cash" },
+    { question: "Goods worth Rs. 5,000/- taken by proprietor for domestic use should be credited to:", options: ["Sales Account", "Proprietor’s personal expenses.", "Purchase account.", "Purchase return account."], answer: "Purchase account." },
+    { question: "Credit balances in the ledger will be:", options: ["A revenue or an asset", "An expense or on asset", "A revenue or a liability", "None of the three"], answer: "A revenue or a liability" },
+    { question: "Journal is a Book of _____ entry, while Ledger is a book of ____ entry.", options: ["First, Second", "Second, First", "Primary, Smart", "Final, Primary"], answer: "First, Second" },
+    { question: "Ledger book is popularly known as;", options: ["Secondary book of accounts", "Principal book of accounts", "Subsidiary book of accounts", "Tertiary book of account entry."], answer: "Principal book of accounts" },
+    { question: "Trial balance is a statement which shows the ________ or the ________of all the accounts.", options: ["Posted balances, Total of balances.", "Opening balances, Closing balances.", "Debit balance, Credit balance.", "Balances, Entries."], answer: "Debit balance, Credit balance." },
+    { question: "Which of the following is known as the base for preparing trial balance?", options: ["Journal", "Cash Account", "Ledger", "Balance Sheet"], answer: "Ledger" },
+    { question: "Total of purchase return book is posted periodically to the credit of _______.", options: ["Purchase return account", "Cash Book", "Journal proper", "None of the three"], answer: "Purchase return account" },
+    { question: "Purchase of fixed assets on credit basis is recorded in:", options: ["Purchase Book", "Cash Book", "Journal Proper", "None of the above"], answer: "Journal Proper" },
+    { question: "Where two aspects of a transaction are posted in the Cash Book, such an entry is called:", options: ["Credit Entry", "Debit Entry", "Contra Entry", "Double Entry"], answer: "Contra Entry" },
+    { question: "Which of the following is not a type of cash book?", options: ["Five column cash book", "Three column cash book", "Two column cash book", "Simple cash book"], answer: "Five column cash book" },
+    { question: "Rs. 35,000 was spent on painting the new factory. It is a ________.", options: ["Capital expenditure", "Revenue expenditure", "Deferred revenue expenditure", "None of the above"], answer: "Capital expenditure" },
+    { question: "Which account is the odd one out?", options: ["Vehicle for office use.", "Office furniture & Equipment", "Freehold land and Building", "Inventory of material"], answer: "Inventory of material" },
+    { question: "Cost of goods purchased for resale is an example of:", options: ["Deferred Revenue Expenditure", "Revenue Expenditure", "Capital Expenditure", "None of the above"], answer: "Revenue Expenditure" },
+    { question: "Municipal tax Rs. 70,000 under dispute is a:", options: ["Current liability", "Contingent liability", "Revenue loss", "None of the above."], answer: "Contingent liability" },
+    { question: "Present liability of uncertain amount, which can be measured reliably by using substantial degree of estimation is termed as ____________.", options: ["Provision.", "Liability", "Contingent liability", "Contingent asset"], answer: "Provision." },
+    { question: "Errors of commission do not permit:", options: ["Trial balance to agree", "Incorrect totaling of the Balance sheet", "Incorrect totaling of the trial balance", "None of the above"], answer: "Trial balance to agree" },
+    { question: "Rectification entries are first recorded in ______________.", options: ["Trial Balance", "Journal Proper", "Subsidiary Book", "Ledger"], answer: "Journal Proper" },
+    { question: "When preparing a Bank reconciliation statement, if you start with balance as per cash book, then dividends directly collected by bank but not yet entered in cash book within the period are _________.", options: ["Added", "Not required to be adjusted", "Deducted", "None of the above"], answer: "Added" },
+    { question: "A BRS is a part of:", options: ["Part of accounting reports", "Bank Account", "Cash Book", "None of the above"], answer: "None of the above" },
+    { question: "Credit balance in the bank Pass Book represents _____ for the account holder.", options: ["Liability", "Asset", "Reserve", "Provision"], answer: "Asset" },
+    { question: "“Inventories should be out of godown in the sequence in which they arrive” is based on:", options: ["Weighted average.", "LIFO", "FIFO", "HIFO"], answer: "FIFO" },
+    { question: "Which of the following methods does not consider historical cost of inventory?", options: ["Weighted Average", "FIFO", "Retail Price method", "All of the above."], answer: "Retail Price method" },
+    { question: "The system which gives a continuous information regarding quantum and value of inventory is known as:", options: ["Continuous stock-taking", "Periodic inventory", "Perpetual inventory", "None of the above"], answer: "Perpetual inventory" },
+    { question: "The term depletion is used for:", options: ["Fixed Assets", "Natural resources", "Intangible Assets", "All of these"], answer: "Natural resources" },
+    { question: "Depreciation starts on a machine from the date:", options: ["It is installed", "It is purchased", "It is put to use", "None of above."], answer: "It is put to use" },
+    { question: "The expired portion of capital expenditure is shown in the financial statements as:", options: ["As a liability.", "As an expense.", "As an income.", "As an asset."], answer: "As an expense." },
+    { question: "Gross profit is the difference between", options: ["Sales and purchases", "Sales and cost of sales", "Sales and total expenses", "None of the three"], answer: "Sales and cost of sales" },
+    { question: "A promissory note is drawn by _______ in favour of _______.", options: ["Drawer, Drawee.", "Drawer, Payee.", "Maker, Payee.", "Payer, Payee."], answer: "Maker, Payee." },
+    { question: "Liability for the drawer for the bill discounted is a:", options: ["Contingent liability", "Long term liability", "Short term liability", "Current liability"], answer: "Contingent liability" },
+    { question: "Which of the following is correct?", options: ["Sectional Balancing: A system where only one section or a group of Ledger can be balanced.", "Self-balancing: A system where each group of Ledger can be balanced.", "Transfer entry: An entry required for transferring and account from one ledger to another.", "All are correct."], answer: "All are correct." },
+    { question: "Which of the following is not included in the final accounts of an Non-Profit Making Organization?", options: ["Receipts and Payments Account", "Income and Expenditure Account", "Balance Sheet", "All are included."], answer: "All are included." }
 ];
 
 
 // --- JavaScript Logic for the Quiz ---
 document.addEventListener('DOMContentLoaded', () => {
-    // DOM Element References
+    // --- DOM Element References ---
+    // Getting handles to all the HTML elements we'll need to interact with.
     const quizContainer = document.getElementById('quiz-container');
     const quizHeader = document.getElementById('quiz-header');
     const questionArea = document.getElementById('question-area');
     const resultScreen = document.getElementById('result-screen');
+    const finalScoreEl = document.getElementById('final-score');
     
     const scoreEl = document.getElementById('score');
     const questionNumberEl = document.getElementById('question-number');
@@ -785,13 +269,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const jumpInput = document.getElementById('jump-input');
     const jumpBtn = document.getElementById('jump-btn');
 
-    // State Variables
+    // --- State Variables ---
+    // These variables will keep track of the quiz's current state.
     let currentQuestionIndex = 0;
     let score = 0;
     let userAnswers = new Array(quizData.length).fill(null);
 
     // --- Core Functions ---
 
+    /**
+     * Initializes or restarts the quiz.
+     * Resets all state variables and sets up the first question.
+     */
     function startQuiz() {
         currentQuestionIndex = 0;
         score = 0;
@@ -808,21 +297,26 @@ document.addEventListener('DOMContentLoaded', () => {
         updateScoreDisplay();
     }
 
+    /**
+     * Loads a question and its options onto the page.
+     * @param {number} index - The index of the question to load from quizData.
+     */
     function loadQuestion(index) {
-        // Clear previous feedback and styles
+        // Clear previous state
         feedbackMessageEl.textContent = '';
         feedbackMessageEl.className = 'mt-4 text-center font-medium min-h-[24px]';
         nextBtnContainer.style.display = 'none';
 
-        // Apply fade-in animation
+        // Apply fade-in animation for a smooth transition
         questionArea.classList.remove('fade-in');
-        void questionArea.offsetWidth; // Trigger reflow
+        void questionArea.offsetWidth; // This is a trick to trigger a DOM reflow, allowing the animation to restart
         questionArea.classList.add('fade-in');
 
         const question = quizData[index];
-        questionTextEl.innerHTML = question.question; // Use innerHTML to render potential tables
+        questionTextEl.innerHTML = question.question; 
         questionNumberEl.textContent = index + 1;
         
+        // Dynamically create and display the answer options
         optionsContainer.innerHTML = '';
         question.options.forEach(option => {
             const button = document.createElement('button');
@@ -835,31 +329,36 @@ document.addEventListener('DOMContentLoaded', () => {
         updateProgressBar();
         updateNavButtons();
         
-        // If the question was already answered, show the result
+        // If the user has already answered this question (e.g., by navigating back), show their previous answer.
         if (userAnswers[index] !== null) {
             showPreviousAnswer();
         }
     }
 
+    /**
+     * Handles the logic when a user clicks an answer option.
+     * @param {string} selectedOption - The text of the option the user selected.
+     * @param {HTMLElement} selectedButton - The button element that was clicked.
+     */
     function selectAnswer(selectedOption, selectedButton) {
-        // Store the user's answer
-        userAnswers[currentQuestionIndex] = selectedOption;
-
-        const correct = selectedOption === quizData[currentQuestionIndex].answer;
+        userAnswers[currentQuestionIndex] = selectedOption; // Store the answer
+        const isCorrect = selectedOption === quizData[currentQuestionIndex].answer;
         
-        if (correct) {
+        if (isCorrect) {
             score++;
             feedbackMessageEl.textContent = 'Correct!';
             feedbackMessageEl.classList.add('text-green-600');
             selectedButton.classList.add('correct');
         } else {
             const correctAnswer = quizData[currentQuestionIndex].answer;
-            const correctOptionLetter = String.fromCharCode(65 + quizData[currentQuestionIndex].options.indexOf(correctAnswer));
+            const correctOptionIndex = quizData[currentQuestionIndex].options.indexOf(correctAnswer);
+            const correctOptionLetter = String.fromCharCode(65 + correctOptionIndex);
+            
             feedbackMessageEl.innerHTML = `Wrong! The correct answer is <strong>${correctOptionLetter}</strong>: ${correctAnswer}`;
             feedbackMessageEl.classList.add('text-red-600');
             selectedButton.classList.add('incorrect');
             
-            // Highlight the correct answer
+            // Also highlight the correct answer so the user knows what it was.
             Array.from(optionsContainer.children).forEach(btn => {
                 if (btn.textContent === correctAnswer) {
                     btn.classList.add('correct');
@@ -869,35 +368,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
         disableOptions();
         updateScoreDisplay();
-        nextBtnContainer.style.display = 'block';
+        nextBtnContainer.style.display = 'block'; // Show the "Next" button
     }
 
+    /**
+     * Restores the visual state of a previously answered question.
+     */
     function showPreviousAnswer() {
         const previousAnswer = userAnswers[currentQuestionIndex];
         const correctAnswer = quizData[currentQuestionIndex].answer;
         
         Array.from(optionsContainer.children).forEach(button => {
             if (button.textContent === previousAnswer) {
-                if (previousAnswer === correctAnswer) {
-                    button.classList.add('correct');
-                    feedbackMessageEl.textContent = 'Correct!';
-                    feedbackMessageEl.classList.add('text-green-600');
-                } else {
-                    button.classList.add('incorrect');
-                    const correctOptionLetter = String.fromCharCode(65 + quizData[currentQuestionIndex].options.indexOf(correctAnswer));
-                    feedbackMessageEl.innerHTML = `Wrong! The correct answer is <strong>${correctOptionLetter}</strong>: ${correctAnswer}`;
-                    feedbackMessageEl.classList.add('text-red-600');
-                }
+                button.classList.add(previousAnswer === correctAnswer ? 'correct' : 'incorrect');
             }
             if (button.textContent === correctAnswer) {
                 button.classList.add('correct');
             }
         });
+        
+        // Restore feedback message
+        if (previousAnswer === correctAnswer) {
+            feedbackMessageEl.textContent = 'Correct!';
+            feedbackMessageEl.classList.add('text-green-600');
+        } else {
+            const correctOptionIndex = quizData[currentQuestionIndex].options.indexOf(correctAnswer);
+            const correctOptionLetter = String.fromCharCode(65 + correctOptionIndex);
+            feedbackMessageEl.innerHTML = `Wrong! The correct answer is <strong>${correctOptionLetter}</strong>: ${correctAnswer}`;
+            feedbackMessageEl.classList.add('text-red-600');
+        }
 
         disableOptions();
         nextBtnContainer.style.display = 'block';
     }
     
+    /**
+     * Disables all option buttons to prevent changing an answer.
+     */
     function disableOptions() {
         Array.from(optionsContainer.children).forEach(button => {
             button.disabled = true;
@@ -906,12 +413,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    /**
+     * Hides the quiz and displays the final result screen.
+     */
     function showResults() {
         questionArea.style.display = 'none';
         quizHeader.style.display = 'none';
         resultScreen.style.display = 'block';
         resultScreen.classList.add('fade-in');
-        final-score.textContent = `Your final score is ${score} out of ${quizData.length}.`;
+        finalScoreEl.textContent = `Your final score is ${score} out of ${quizData.length}.`;
     }
 
     // --- UI Update Functions ---
@@ -921,17 +431,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateProgressBar() {
-        const progressPercentage = ((currentQuestionIndex + 1) / quizData.length) * 100;
+        const progressPercentage = ((currentQuestionIndex) / quizData.length) * 100;
         progressBar.style.width = `${progressPercentage}%`;
     }
 
     function updateNavButtons() {
         prevBtn.disabled = currentQuestionIndex === 0;
-        if (prevBtn.disabled) {
-            prevBtn.classList.add('btn-disabled');
-        } else {
-            prevBtn.classList.remove('btn-disabled');
-        }
+        prevBtn.classList.toggle('btn-disabled', prevBtn.disabled);
     }
 
     // --- Event Handlers ---
@@ -941,7 +447,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentQuestionIndex < quizData.length) {
             loadQuestion(currentQuestionIndex);
         } else {
-            showResults();
+            // End of quiz
+            updateProgressBar(); // To make it 100%
+            setTimeout(showResults, 300);
         }
     });
 
@@ -957,13 +465,7 @@ document.addEventListener('DOMContentLoaded', () => {
     resetScoreBtn.addEventListener('click', () => {
         score = 0;
         updateScoreDisplay();
-    });
-
-    jumpBtn.addEventListener('click', jumpToQuestion);
-    jumpInput.addEventListener('keyup', (event) => {
-        if (event.key === 'Enter') {
-            jumpToQuestion();
-        }
+        // Optional: you could also clear userAnswers if you want reset to clear progress
     });
 
     function jumpToQuestion() {
@@ -973,9 +475,21 @@ document.addEventListener('DOMContentLoaded', () => {
             loadQuestion(currentQuestionIndex);
             jumpInput.value = '';
         } else {
-            alert(`Please enter a number between 1 and ${quizData.length}.`);
+            // Using a simple modal/alert for feedback
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center';
+            modal.innerHTML = `<div class="bg-white p-6 rounded-lg shadow-lg">Please enter a number between 1 and ${quizData.length}.</div>`;
+            document.body.appendChild(modal);
+            setTimeout(() => document.body.removeChild(modal), 2000);
         }
     }
+
+    jumpBtn.addEventListener('click', jumpToQuestion);
+    jumpInput.addEventListener('keyup', (event) => {
+        if (event.key === 'Enter') {
+            jumpToQuestion();
+        }
+    });
 
     // --- Initial Load ---
     startQuiz();
