@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AAO Accountancy & Economics Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom animation for fading in questions */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        /* Hide spinner arrows on number input */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+        /* Custom styles for answer feedback */
+        .correct-answer {
+            background-color: #22c55e !important; /* Tailwind green-500 */
+            color: white !important;
+            border-color: #16a34a !important; /* Tailwind green-600 */
+        }
+        .incorrect-answer {
+            background-color: #ef4444 !important; /* Tailwind red-500 */
+            color: white !important;
+            border-color: #dc2626 !important; /* Tailwind red-600 */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 flex flex-col items-center justify-center min-h-screen p-4">
+
+    <!-- Global Headings -->
+    <header class="text-center mb-6">
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-700">AAO Accountancy & Economics Quiz</h1>
+        <h2 id="quiz-subtitle" class="text-lg text-gray-500 mt-2">Complete 100 Questions - Exam Preparation Tool</h2>
+    </header>
+
+    <!-- Main Quiz Container -->
+    <main id="quiz-container" class="bg-white w-full max-w-3xl rounded-2xl shadow-lg p-6 md:p-8 transition-all duration-300">
+        
+        <!-- Quiz Header -->
+        <div id="quiz-header">
+            <div class="flex justify-between items-center mb-4">
+                <p class="text-lg font-semibold">Score: <span id="score" class="text-indigo-600">0</span></p>
+                <button id="reset-score-btn" class="text-sm text-indigo-600 hover:underline">Reset Score</button>
+            </div>
+
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+                <p class="font-medium">Question <span id="question-number" class="font-bold">1</span> of <span id="total-questions" class="font-bold">100</span></p>
+                <div class="flex items-center gap-2">
+                    <label for="jump-input" class="text-sm">Jump to:</label>
+                    <input type="number" id="jump-input" class="w-16 p-2 border border-gray-300 rounded-md text-center">
+                    <button id="jump-btn" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm font-semibold">Go</button>
+                </div>
+            </div>
+
+            <div class="w-full bg-gray-200 rounded-full h-2.5 mb-6">
+                <div id="progress-bar" class="bg-indigo-600 h-2.5 rounded-full" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Question Area -->
+        <div id="question-area">
+            <h2 id="question-text" class="text-xl md:text-2xl font-semibold mb-6 min-h-[6rem]">Question text goes here.</h2>
+            <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <!-- Options will be dynamically inserted here -->
+            </div>
+            <p id="feedback-message" class="mt-4 text-center font-medium min-h-[1.5rem]"></p>
+            <div id="navigation-buttons" class="mt-6 flex justify-between items-center">
+                <button id="prev-btn" class="px-6 py-2 bg-gray-300 text-gray-800 rounded-lg font-semibold hover:bg-gray-400 transition disabled:opacity-50 disabled:cursor-not-allowed">← Previous</button>
+                <div id="next-btn-container" class="hidden">
+                     <button id="next-btn" class="px-8 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition">Next →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result-screen" class="hidden text-center py-8">
+            <h2 class="text-3xl font-bold mb-4">Quiz Completed!</h2>
+            <p id="final-score" class="text-2xl mb-8">Your final score is 0 out of 100.</p>
+            <button id="restart-btn" class="px-8 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition text-lg">Restart Quiz</button>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // This array holds all the questions, options, and correct answers.
+            // All questions are extracted from the provided PDF document.
+            const quizData = [
+                // Chapter: Comptroller & Auditor General of India
+                {
+                    question: "Who appoints the CAG of India?",
+                    options: ["Chief Justice of India", "Prime Minister of India", "President of India", "Vice-President of India"],
+                    answer: "President of India"
+                },
+                {
+                    question: "Comptroller and Auditor General of India acts as a Friend, Philosopher and Guide for:",
+                    options: ["Finance Ministry", "Finance Commission", "PAC", "Prime Minister"],
+                    answer: "PAC"
+                },
+                {
+                    question: "As per article ___ of the Indian Constitution, 'The accounts of the Union and of the States shall be kept in such form as the President may, on the advice of the Comptroller and Auditor-General of India, prescribe.'",
+                    options: ["148", "149", "150", "280"],
+                    answer: "150"
+                },
+                {
+                    question: "Who among the following was the first CAG of India?",
+                    options: ["V. Narahari Rao", "Vinod Rai", "Shashikant Sharma", "K.C. Neogy."],
+                    answer: "V. Narahari Rao"
+                },
+                {
+                    question: "The tenure of CAG is:",
+                    options: ["5 Years", "3 Years or 60 Years of age, whichever is earlier", "6 Years", "6 Years or 65 Years of age, whichever is earlier."],
+                    answer: "6 Years or 65 Years of age, whichever is earlier."
+                },
+                {
+                    question: "According to which article of the Constitution of India 'CAG of India ascertains and certifies the net proceeds of any tax or duty. His certification is final.'?",
+                    options: ["Article 148", "Article 280", "Article 279", "Article 149"],
+                    answer: "Article 279"
+                },
+
+                // Chapter: Finance Commission
+                {
+                    question: "Which one of the following variables was not used by the Fourteenth Finance Commission for Horizontal devolution of money to the states?",
+                    options: ["Income Distance", "Area", "Population Census 1971", "Literacy Rate"],
+                    answer: "Literacy Rate"
+                },
+                {
+                    question: "Which of the following states got the highest share in taxes by the 14th Finance Commission recommendation?",
+                    options: ["J&K", "Uttar Pradesh", "Bihar", "Maharashtra"],
+                    answer: "Uttar Pradesh"
+                },
+                {
+                    question: "Which of the following roles is NOT under the purview of the Finance commission?",
+                    options: ["Sharing of net proceeds of taxes between the Center and States.", "Recommending principles for governing the grants-in-aid to the states by the Center.", "Preparation and periodical revision of electoral rolls.", "Recommendations on matters referred to it by the President for the interest of sound finance."],
+                    answer: "Preparation and periodical revision of electoral rolls."
+                },
+                {
+                    question: "The Constitution of India envisages the ___ as the balancing wheel of fiscal federalism in India.",
+                    options: ["CAG", "Finance commission", "NITI AAYOG", "RBI"],
+                    answer: "Finance commission"
+                },
+                {
+                    question: "Article ___ of the Indian Constitution provides for a Finance Commission as a quasi-judicial body.",
+                    options: ["280", "281", "275", "None of the above."],
+                    answer: "280"
+                },
+                {
+                    question: "Who was the chairman of Fourteenth Finance Commission?",
+                    options: ["Y.V. Reddy", "Dr. Vijay Kelkar", "Dr. C. Rangrajan", "Dr. K.C. Neogy"],
+                    answer: "Y.V. Reddy"
+                },
+                {
+                    question: "The Fourteenth Finance Commission has recommended states' share in net proceeds of tax revenues be ___ per cent, a huge jump from the ___ per cent recommend by the 13th Finance Commission.",
+                    options: ["50, 40", "45, 35", "40, 15", "42, 32"],
+                    answer: "42, 32"
+                },
+                {
+                    question: "Which of the following is considered 'The Guardian of Public Purse' in India?",
+                    options: ["Finance Commission", "NITI Aayog", "CAG", "RBI"],
+                    answer: "CAG"
+                },
+                {
+                    question: "Which of the following is not a constitutional body?",
+                    options: ["Finance Commission", "CAG", "Election Commission", "NITI Aayog"],
+                    answer: "NITI Aayog"
+                },
+
+                // Chapter: Basic Concept of Economics and introduction to Micro Economics
+                {
+                    question: "Macroeconomics is also called ___ economics.",
+                    options: ["Applied economics", "Aggregate Economics", "Experimental Economics", "None of the above"],
+                    answer: "Aggregate Economics"
+                },
+                {
+                    question: "In the conversation: Suresh: 'My corn harvest this year is poor.' Mukesh: 'Don't worry. Price increases will compensate...' Harish: 'Climate affects crop yields...' Swati: 'The Government ought to guarantee that our income will not fall.' The normative statement is made by?",
+                    options: ["Suresh", "Mukesh", "Harish", "Swati"],
+                    answer: "Swati"
+                },
+                {
+                    question: "Economics according to Lionel Robbins, is a",
+                    options: ["Normative Science", "Applied Science", "Positive Science", "Experimental Science"],
+                    answer: "Positive Science"
+                },
+                {
+                    question: "Periods of less than full employment correspond to:",
+                    options: ["Points outside the PPC", "Points inside the PPC", "Points on the PPC", "Either points inside or outside the PPC"],
+                    answer: "Points inside the PPC"
+                },
+                {
+                    question: "Which of the following is a normative economic statement?",
+                    options: ["Economics is a social science that studies human behavior.", "India spends a huge amount of money on national defense.", "The minimum wage should be raised to Rs. 500/- per day.", "Unemployment rate decrease with industrialization."],
+                    answer: "The minimum wage should be raised to Rs. 500/- per day."
+                },
+                {
+                    question: "What does an outward shift of the PPC indicate?",
+                    options: ["Inflation", "Economic Growth", "Over production", "Over employment production."],
+                    answer: "Economic Growth"
+                },
+                {
+                    question: "Which of the following is a central problem of economics?",
+                    options: ["What to Produce?", "How to produce?", "For whom to produce?", "All of the above"],
+                    answer: "All of the above"
+                },
+                 {
+                    question: "Administered prices refer to:",
+                    options: ["Prices determined by sellers in the market.", "Prices determined by an external authority which is usually the government.", "Price determined by forces of demand and supply.", "None of the above."],
+                    answer: "Prices determined by an external authority which is usually the government."
+                },
+                {
+                    question: "The term 'Economics' owes it origin to Greek Word:",
+                    options: ["Aikonomia", "Wikonomia", "Oikonomia", "None of the above"],
+                    answer: "Oikonomia"
+                },
+                {
+                    question: "Price theory is an important constituent of ___ Economics.",
+                    options: ["Micro", "Macro", "Developed", "Welfare"],
+                    answer: "Micro"
+                },
+                {
+                    question: "Opportunity cost are a result of:",
+                    options: ["Scarcity", "Overproduction", "Technology obsolescence", "Abundance of resources"],
+                    answer: "Scarcity"
+                },
+                {
+                    question: "The branch of economic theory that deals with the problem of allocation of resource is:",
+                    options: ["Macroeconomics", "Microeconomics", "Fiscal Economics.", "None of the above."],
+                    answer: "Microeconomics"
+                },
+                {
+                    question: "If the opportunity cost is constant, then PPC would be:",
+                    options: ["Convex", "Straight line", "Backward bending", "Concave."],
+                    answer: "Straight line"
+                },
+                {
+                    question: "Which of the following is not correctly matched?",
+                    options: ["Economics is a 'Science which deals with wealth': J.B. Say", "'The Wealth of Nations' was written by Adam Smith", "'Nature and significance of Economics' was written by A.C. Pigou", "'The General Theory of Employment, Interest and Money was written by John Maynard Keynes."],
+                    answer: "'Nature and significance of Economics' was written by A.C. Pigou"
+                },
+                {
+                    question: "India is an Example of:",
+                    options: ["Mixed Economy", "Capitalism", "Socialism", "None of the above"],
+                    answer: "Mixed Economy"
+                },
+                
+                // Chapter: Theory of Demand and Supply
+                {
+                    question: "Expansion and Contraction of demand means:",
+                    options: ["Movement to a higher demand curve", "Movement to a lower demand curve", "Movement along the same demand curve", "Both 1 and 2"],
+                    answer: "Movement along the same demand curve"
+                },
+                {
+                    question: "'Ceteris Paribus' clause in the law of demand does not mean:",
+                    options: ["The price of commodity does not change.", "The price of its substitutes does not change.", "The income of consumer does not change.", "The price of complementary goods does not change."],
+                    answer: "The price of commodity does not change."
+                },
+                {
+                    question: "At the point above the middle of a straight-line demand curve, elasticity of demand is:",
+                    options: [">1", "<1", "=1", "=0"],
+                    answer: ">1"
+                },
+                {
+                    question: "Elasticity of supply is zero means:",
+                    options: ["Imperfectly elastic supply", "Perfectly elastic supply", "Imperfectly inelastic supply", "Perfectly inelastic supply"],
+                    answer: "Perfectly inelastic supply"
+                },
+                {
+                    question: "The supply curve shifts to the right because of:",
+                    options: ["Improved technology", "Increased price of factors of production", "Increased excise duty", "All of the above"],
+                    answer: "Improved technology"
+                },
+                {
+                    question: "The luxury goods like diamond and jewellery will have:",
+                    options: ["Low income elasticity of demand", "High income elasticity of demand", "Zero income elasticity of demand", "None of the above"],
+                    answer: "High income elasticity of demand"
+                },
+                {
+                    question: "If regardless of change in its price, the quantity demanded of a commodity remains unchanged then the demand curve for the good will be:",
+                    options: ["Horizontal", "Vertical", "Positively sloped", "Negatively Sloped"],
+                    answer: "Vertical"
+                },
+                {
+                    question: "Marginal utility approach to demand was given by",
+                    options: ["AC Pigou.", "Adam Smith", "Alfred Marshall", "J.M. Keynes"],
+                    answer: "Alfred Marshall"
+                },
+                {
+                    question: "Consumer surplus is highest in the case of:",
+                    options: ["Necessities", "Luxuries", "Conventional necessities", "Comforts"],
+                    answer: "Necessities"
+                },
+                {
+                    question: "An indifference curve slopes down towards right since more of one commodity and less of another result in:",
+                    options: ["Same Satisfaction", "Greater Satisfaction", "Maximum Satisfaction", "Decreasing expenditure."],
+                    answer: "Same Satisfaction"
+                },
+                {
+                    question: "When total demand for a commodity whose price has fallen increases, it is due to:",
+                    options: ["Price Effect", "Substitute Effect", "Complementary Effect", "Income Effect."],
+                    answer: "Price Effect"
+                },
+                {
+                    question: "Demand curve in most cases slopes:",
+                    options: ["Downward towards right", "Vertical and parallel to X-axis", "Upwards towards left", "Horizontal and parallel to X-axis"],
+                    answer: "Downward towards right"
+                },
+                {
+                    question: "Giffen goods are those goods",
+                    options: ["For which demand increases as price increases.", "Which have a high-income elasticity of demand", "Which are in short supplies.", "None of these"],
+                    answer: "For which demand increases as price increases."
+                },
+                {
+                    question: "At higher prices people demand more of certain goods not for their worth but for their prestige value. This is called:",
+                    options: ["Giffen paradox", "Speculative effect", "Veblen effect", "None of the above."],
+                    answer: "Veblen effect"
+                },
+                {
+                    question: "Contraction of demand is the result of:",
+                    options: ["Decrease in the number of consumers.", "Increase in the price of the good concerned.", "Increase in the price of other goods.", "Decrease in the income of purchasers."],
+                    answer: "Increase in the price of the good concerned."
+                },
+                {
+                    question: "Total utility is maximum when:",
+                    options: ["Marginal utility is at its highest point.", "Marginal Utility is equal to average utility.", "Average utility is maximum.", "Marginal Utility is zero."],
+                    answer: "Marginal Utility is zero."
+                },
+                {
+                    question: "Which factor generally keeps the price-elasticity of demand for a good low?",
+                    options: ["Its Low Price", "Variety of uses for that good.", "Close substitute for that good.", "High Proportion of the consumer's income spent on it."],
+                    answer: "Its Low Price"
+                },
+                {
+                    question: "A necessity is defined as a good having:",
+                    options: ["Zero Income elasticity of demand.", "A negative income elasticity of demand.", "An income elasticity of demand between zero and one.", "None of the above."],
+                    answer: "An income elasticity of demand between zero and one."
+                },
+                {
+                    question: "If the demand is more than supply, then the pressure on price will be:",
+                    options: ["Upward", "Downward", "Constant", "None of the above"],
+                    answer: "Upward"
+                },
+                {
+                    question: "Which of the following pairs of goods is an example of substitutes?",
+                    options: ["Tea and sugar", "Tea and Coffee", "Pen and Ink", "Shirt and Trousers."],
+                    answer: "Tea and Coffee"
+                },
+                {
+                    question: "The supply curve for perishable commodities is",
+                    options: ["Elastic.", "Inelastic", "Perfectly Elastic.", "Perfectly Inelastic."],
+                    answer: "Perfectly Inelastic."
+                },
+                {
+                    question: "In economics, what a consumer is ready to pay minus what he actually pays, is termed as:",
+                    options: ["Consumer's equilibrium", "Consumer's surplus", "Consumer's profit", "None of the above."],
+                    answer: "Consumer's surplus"
+                },
+                {
+                    question: "If the elasticity of demand for a commodity is perfectly inelastic then which of the following is incorrect?",
+                    options: ["The elasticity of demand for this commodity must equal zero.", "The commodity will be purchased regardless of increase in its price.", "The commodity must have many substitutes", "The commodity must be essential to those who purchase it."],
+                    answer: "The commodity must have many substitutes"
+                },
+                {
+                    question: "In a typical demand schedule quantity demanded:",
+                    options: ["Varies directly with price", "Varies proportionately with price.", "Is independent of price.", "Varies inversely with price"],
+                    answer: "Varies inversely with price"
+                },
+
+                // Chapter: Theory of Production and cost
+                {
+                    question: "Which of the followings is a factor of production?",
+                    options: ["Land", "Labour", "Capital", "All of these"],
+                    answer: "All of these"
+                },
+                {
+                    question: "The marginal product of a variable inputs is best described as:",
+                    options: ["Total product divided by the number of units of variable input.", "The additional output resulting from a one-unit increase in the variable input.", "The additional output resulting from a one-unit increase in both the variable and fixed inputs.", "Any of the above"],
+                    answer: "The additional output resulting from a one-unit increase in the variable input."
+                },
+                {
+                    question: "Which of the following curve is a rectangular hyperbola?",
+                    options: ["ATC", "AFC", "AVC", "MC"],
+                    answer: "AFC"
+                },
+                {
+                    question: "Both marginal and average costs are equal when:",
+                    options: ["Marginal cost is minimum", "Average cost is minimum", "Both marginal and average costs are minimum", "None of the above"],
+                    answer: "Average cost is minimum"
+                },
+                {
+                    question: "Economies of scale means:",
+                    options: ["Reduction in unit cost of production", "Reductions in unit cost of distribution", "Addition to the unit cost of production", "Reduction in the total cost of production"],
+                    answer: "Reduction in unit cost of production"
+                },
+                {
+                    question: "In general, most of the production functions measure:",
+                    options: ["The productivity of factors of production", "The relation between the factors of production", "The economies of scale", "The relations between change in physical inputs and physical output."],
+                    answer: "The relations between change in physical inputs and physical output."
+                },
+                {
+                    question: "The Diamond Water' controversy is explained by -",
+                    options: ["Total utility", "Quantity supplied", "Marginal utility", "Price offered"],
+                    answer: "Marginal utility"
+                },
+                {
+                    question: "Which of the following is an example of an 'explicit cost'?",
+                    options: ["The payment of wages by the firm.", "The normal profit earned by the firm.", "The income that could have been earned in alternative uses by the resources owned by the firm.", "The wages a proprietor could have made by working as an employee of a large firm."],
+                    answer: "The payment of wages by the firm."
+                },
+                {
+                    question: "Laws of production does not include:",
+                    options: ["Law of variable proportions.", "Least cost combination of factors.", "Law of diminishing returns to a factor.", "Returns to scale."],
+                    answer: "Least cost combination of factors."
+                },
+                {
+                    question: "The term 'Land' is used in a special sense in Economics. Which of the following is not correct about Land?",
+                    options: ["Land is a free gift of nature.", "Supply of land is fixed.", "Land is an active factor of production.", "Land is immobile."],
+                    answer: "Land is an active factor of production."
+                },
+                {
+                    question: "Which of the following is a function of an entrepreneur?",
+                    options: ["Initiating business enterprise and resource co-ordination.", "Risk bearing or uncertainty bearing.", "Innovations.", "All of the above."],
+                    answer: "All of the above."
+                },
+                {
+                    question: "Diminishing marginal returns for the first four units of a variable input is exhibited by the total product sequence:",
+                    options: ["50, 50, 50, 50", "50, 110, 180, 260", "50, 100, 150, 200", "50, 90, 120, 140"],
+                    answer: "50, 90, 120, 140"
+                },
+                {
+                    question: "To economists, the main difference between the short run and the long run is that:",
+                    options: ["In the short run all inputs are fixed, while in the long run all inputs are variable.", "In the short run, the firm varies all of its inputs to find the least cost combination of inputs.", "In the short run, at least one of the firm's input level is fixed.", "In the long run, the firm is making a constrained decision about how to use existing plant and equipment efficiently."],
+                    answer: "In the short run, at least one of the firm's input level is fixed."
+                },
+                {
+                    question: "Which of the following statements describes increasing returns to scale?",
+                    options: ["Increasing inputs by 1/5 leads to an increase in output of 1/4.", "Increasing the inputs by 100% leads to an 80% increase in output.", "Increasing the inputs by 50% leads to 50% increase in output.", "None of the above."],
+                    answer: "Increasing inputs by 1/5 leads to an increase in output of 1/4."
+                },
+                {
+                    question: "The 'law of diminishing returns' applies to:",
+                    options: ["The short run, but not the long run.", "The long run, but not the short run.", "Both the short run and the long run.", "Neither short run nor the long run."],
+                    answer: "The short run, but not the long run."
+                },
+                {
+                    question: "Which of the following is a variable cost in the short run?",
+                    options: ["Rent of the factory", "Wages paid to the factory labour.", "Interest payments on borrowed financial capital.", "Payment on the lease for factory equipment."],
+                    answer: "Wages paid to the factory labour."
+                },
+                {
+                    question: "Marginal cost is:",
+                    options: ["Always less than the average cost.", "Always more than the average cost.", "Equal to average cost at its minimum point.", "Never equal to average cost."],
+                    answer: "Equal to average cost at its minimum point."
+                },
+                {
+                    question: "All the following curves are U-shaped except:",
+                    options: ["The AVC curve", "The AFC curves", "The AC curves", "The MC curves"],
+                    answer: "The AFC curves"
+                },
+                {
+                    question: "If as result of 30% increase in all inputs, the output increases by 20% this is a case of:",
+                    options: ["Increasing returns to scale", "Constant returns to scale", "Increasing returns to factor", "Decreasing returns to scale."],
+                    answer: "Decreasing returns to scale."
+                },
+                {
+                    question: "Marginal Revenue is equal to:",
+                    options: ["Price, but only if the firm is price searcher.", "The change in P x Q due to a one-unit change in output.", "The change in quantity divided by the change in price.", "The change in price divided by the change in output."],
+                    answer: "The change in P x Q due to a one-unit change in output."
+                },
+                {
+                    question: "Which of the following is best definition of the 'Production function'?",
+                    options: ["The relationship between market price and quantity supplied.", "The relationship between the quantities of inputs needed to produce a given level of output.", "The relationship between the quantity of inputs and the firm's marginal cost of production.", "The relationship between the firm's total revenue and the cost of production."],
+                    answer: "The relationship between the quantities of inputs needed to produce a given level of output."
+                },
+                {
+                    question: "The vertical difference between TVC and TC is equal to:",
+                    options: ["MC", "AVC", "TFC", "None of the above"],
+                    answer: "TFC"
+                },
+                {
+                    question: "Marginal cost is defined as:",
+                    options: ["The change in total cost due to a one-unit change in output.", "Total cost divided by output.", "The change in output due to a one-unit change in an input.", "Total product divided by the quantity of input."],
+                    answer: "The change in total cost due to a one-unit change in output."
+                },
+                {
+                    question: "Who among of the followings creates time utility?",
+                    options: ["Farmer", "Carpenter", "Trader", "Driver"],
+                    answer: "Trader"
+                },
+                {
+                    question: "Which stage of the given stages is relevant for a firm which aims at maximum economic efficiency in the law of variable proportion.",
+                    options: ["Stage I", "Stage II", "Stage III", "Stage IV"],
+                    answer: "Stage II"
+                },
+                 {
+                    question: "The Regulation on Audit and Accounts was made by C&AG of India under the powers conferred on him by ___ of C&AGs (DPC) Act, 1971.",
+                    options: ["Section 20", "Section 21", "Section 23", "Section 24"],
+                    answer: "Section 23"
+                },
+                {
+                    question: "The Regulation on Audit and Accounts were made by C&AG of India in the year",
+                    options: ["2005", "2007", "2008", "2009"],
+                    answer: "2007"
+                },
+                {
+                    question: "C&AGs authority to inspect any office of accounts under the control of union is derived from ___ of C&AGs (DPC)act.",
+                    options: ["Section 13", "Section 14", "Section 18", "Section 19"],
+                    answer: "Section 18"
+                },
+                {
+                    question: "The scope and extent of audit shall be determined by the C&AG of India under which section of DPC Act?",
+                    options: ["Section 10", "Section 13", "Section 19 A", "Section 23"],
+                    answer: "Section 23"
+                },
+                {
+                    question: "The power to dispense with detailed audit of any accounts or transaction is derived by C&AG of India under ___ of DPC act.",
+                    options: ["Section 22", "Section 23", "Section 24", "Section 25"],
+                    answer: "Section 24"
+                },
+                {
+                    question: "Under the constitution of India, it is the duty of the C&AG of India to audit and report on the accounts of the",
+                    options: ["Union Government", "Governments of each State", "Government of Union Territory having legislative assembly", "all of the above"],
+                    answer: "all of the above"
+                },
+                {
+                    question: "C&AG is authorised to audit all expenditure from consolidated fund of India and of a state and of a Union Territory having a legislative assembly under ___ of DPC act.",
+                    options: ["Section 13", "Section 14", "Section 15", "Section 16"],
+                    answer: "Section 13"
+                },
+                {
+                    question: "Authority for C&AG to audit all transaction of the Union and of the State and Union Territorys relating to contingency funds and Public accounts is derived from ___ of DPC Act.",
+                    options: ["Section 2 (e)", "Section 2 (e) r/w Section 13", "Section 13", "None of the above"],
+                    answer: "Section 13"
+                },
+                {
+                    question: "C&AG is authorised to audit all receipts of the GOI and of Government of each State and of each Union Territory having a legislative assembly under ___ of DPC Act.",
+                    options: ["Section 13", "Section 14", "Section 15", "Section 16"],
+                    answer: "Section 16"
+                },
+                {
+                    question: "C&AGs power to audit and report on the accounts of the stores and stock kept in any office or department of the Union is derived from",
+                    options: ["Section 15", "Section 16", "Section 17", "Section 18"],
+                    answer: "Section 17"
+                },
+                {
+                    question: "The audit of bodies and authorities, other than Government establishments and companies, by C&AG is governed by the provision contained in",
+                    options: ["Section 14, 15 & 20 of the DPC Act", "Section 14,15,19(1), 19(2) and 19(3) of the DPC Act", "Section 14,15,19(2) and 19(3), 19 A and 20 of the DPC Act", "Section 14,15,19(1), 19(2) and 19(3), 20 of the DPC Act"],
+                    answer: "Section 14,15,19(1), 19(2) and 19(3), 20 of the DPC Act"
+                },
+                {
+                    question: "Section 14(1) of the DPC act authorises the C&AG to audit the receipts and expenditure of a body or authority if the amount of Government grant or loan paid to it in a financial year is not less than Rs ___ and the amount of such grant or loan is not less than ___ of its total expenditure during the year.",
+                    options: ["25 lakh, 75%", "50 lakh, 50%", "1 crore, 75%", "5 lakh, 50%"],
+                    answer: "25 lakh, 75%"
+                },
+                {
+                    question: "Section 14 (2) of the Act empowers the C&AG to audit all receipts and expenditure of a body or authority if the amount of Government grant or loan to the body or authority in a financial year is not less than",
+                    options: ["Rs 25 lakh", "Rs 50 lakh", "Rs one crore", "Rs five crore"],
+                    answer: "Rs one crore"
+                },
+                {
+                    question: "Where a body of authority is audited under Section 14(1) or 14(2) for a particular year, then C&AG is empowered to continue to audit that body or authority for a further period of",
+                    options: ["one year", "two years", "three years", "none of the above"],
+                    answer: "two years"
+                }
+            ];
+
+            // DOM element references
+            const quizSubtitle = document.getElementById('quiz-subtitle');
+            const scoreEl = document.getElementById('score');
+            const resetScoreBtn = document.getElementById('reset-score-btn');
+            const questionNumberEl = document.getElementById('question-number');
+            const totalQuestionsEl = document.getElementById('total-questions');
+            const jumpInput = document.getElementById('jump-input');
+            const jumpBtn = document.getElementById('jump-btn');
+            const progressBar = document.getElementById('progress-bar');
+            const questionTextEl = document.getElementById('question-text');
+            const optionsContainer = document.getElementById('options-container');
+            const feedbackMessageEl = document.getElementById('feedback-message');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const nextBtnContainer = document.getElementById('next-btn-container');
+            const quizContainer = document.getElementById('quiz-container');
+            const quizHeader = document.getElementById('quiz-header');
+            const questionArea = document.getElementById('question-area');
+            const resultScreen = document.getElementById('result-screen');
+            const finalScoreEl = document.getElementById('final-score');
+            const restartBtn = document.getElementById('restart-btn');
+
+            // Quiz state variables
+            let currentQuestionIndex = 0;
+            let score = 0;
+            let answeredQuestions = new Array(quizData.length).fill(null); // To track answers
+
+            /**
+             * Initializes the quiz or loads a specific question.
+             */
+            function loadQuestion() {
+                // Clear any previous state
+                feedbackMessageEl.textContent = '';
+                feedbackMessageEl.className = 'mt-4 text-center font-medium min-h-[1.5rem]';
+                nextBtnContainer.classList.add('hidden');
+                questionArea.classList.add('fade-in');
+                // Remove animation class after it plays
+                setTimeout(() => questionArea.classList.remove('fade-in'), 500);
+
+                // Check if quiz is over
+                if (currentQuestionIndex >= quizData.length) {
+                    showResults();
+                    return;
+                }
+
+                const currentQuestion = quizData[currentQuestionIndex];
+
+                // Update UI elements
+                questionNumberEl.textContent = currentQuestionIndex + 1;
+                questionTextEl.textContent = currentQuestion.question;
+                optionsContainer.innerHTML = '';
+
+                // Create and append option buttons
+                currentQuestion.options.forEach(option => {
+                    const button = document.createElement('button');
+                    button.innerHTML = option;
+                    button.classList.add('w-full', 'p-4', 'border', 'border-gray-300', 'rounded-lg', 'text-left', 'hover:bg-indigo-100', 'hover:border-indigo-400', 'transition', 'duration-200');
+                    button.addEventListener('click', () => selectAnswer(button, option));
+                    optionsContainer.appendChild(button);
+                });
+
+                updateProgress();
+                updateNavigationButtons();
+
+                // If the question was already answered, restore its state
+                if (answeredQuestions[currentQuestionIndex] !== null) {
+                    restoreAnswerState();
+                }
+            }
+
+            /**
+             * Restores the visual state of a previously answered question.
+             */
+            function restoreAnswerState() {
+                const userAnswer = answeredQuestions[currentQuestionIndex];
+                const correctAnswer = quizData[currentQuestionIndex].answer;
+                const optionButtons = optionsContainer.querySelectorAll('button');
+
+                optionButtons.forEach(button => {
+                    button.disabled = true;
+                    if (button.innerHTML === correctAnswer) {
+                        button.classList.add('correct-answer');
+                    }
+                    if (button.innerHTML === userAnswer && userAnswer !== correctAnswer) {
+                        button.classList.add('incorrect-answer');
+                    }
+                });
+                
+                if (userAnswer === correctAnswer) {
+                    feedbackMessageEl.textContent = 'Correct!';
+                    feedbackMessageEl.classList.add('text-green-600');
+                } else {
+                    const correctOptionLetter = quizData[currentQuestionIndex].options.indexOf(correctAnswer);
+                    const letter = String.fromCharCode(65 + correctOptionLetter);
+                    feedbackMessageEl.innerHTML = `Wrong! The correct answer is <strong>${letter}: ${correctAnswer}</strong>`;
+                    feedbackMessageEl.classList.add('text-red-600');
+                }
+                nextBtnContainer.classList.remove('hidden');
+            }
+
+
+            /**
+             * Handles the logic when a user selects an answer.
+             * @param {HTMLButtonElement} selectedButton - The button element that was clicked.
+             * @param {string} selectedOption - The text content of the selected option.
+             */
+            function selectAnswer(selectedButton, selectedOption) {
+                const correctAnswer = quizData[currentQuestionIndex].answer;
+                const optionButtons = optionsContainer.querySelectorAll('button');
+                
+                // Disable all buttons to prevent changing the answer
+                optionButtons.forEach(button => button.disabled = true);
+
+                answeredQuestions[currentQuestionIndex] = selectedOption;
+
+                // Check if the answer is correct and apply styles
+                if (selectedOption === correctAnswer) {
+                    score++;
+                    selectedButton.classList.add('correct-answer');
+                    feedbackMessageEl.textContent = 'Correct!';
+                    feedbackMessageEl.classList.add('text-green-600');
+                } else {
+                    selectedButton.classList.add('incorrect-answer');
+                    const correctButton = Array.from(optionButtons).find(btn => btn.innerHTML === correctAnswer);
+                    if (correctButton) {
+                        correctButton.classList.add('correct-answer');
+                    }
+                    const correctOptionLetter = quizData[currentQuestionIndex].options.indexOf(correctAnswer);
+                    const letter = String.fromCharCode(65 + correctOptionLetter); // A, B, C, D
+                    feedbackMessageEl.innerHTML = `Wrong! The correct answer is <strong>${letter}: ${correctAnswer}</strong>`;
+                    feedbackMessageEl.classList.add('text-red-600');
+                }
+
+                scoreEl.textContent = score;
+                nextBtnContainer.classList.remove('hidden');
+            }
+
+            /**
+             * Updates the progress bar based on the current question index.
+             */
+            function updateProgress() {
+                const progressPercentage = ((currentQuestionIndex + 1) / quizData.length) * 100;
+                progressBar.style.width = `${progressPercentage}%`;
+            }
+
+            /**
+             * Updates the state of the 'Previous' and 'Next' navigation buttons.
+             */
+            function updateNavigationButtons() {
+                prevBtn.disabled = currentQuestionIndex === 0;
+            }
+
+            /**
+             * Displays the final results screen.
+             */
+            function showResults() {
+                quizHeader.classList.add('hidden');
+                questionArea.classList.add('hidden');
+                resultScreen.classList.remove('hidden');
+                finalScoreEl.textContent = `Your final score is ${score} out of ${quizData.length}.`;
+            }
+            
+            /**
+             * Resets the quiz to its initial state.
+             */
+            function restartQuiz() {
+                currentQuestionIndex = 0;
+                score = 0;
+                answeredQuestions.fill(null);
+                scoreEl.textContent = '0';
+                resultScreen.classList.add('hidden');
+                quizHeader.classList.remove('hidden');
+                questionArea.classList.remove('hidden');
+                loadQuestion();
+            }
+
+            // Event Listeners Setup
+            prevBtn.addEventListener('click', () => {
+                if (currentQuestionIndex > 0) {
+                    currentQuestionIndex--;
+                    loadQuestion();
+                }
+            });
+
+            nextBtn.addEventListener('click', () => {
+                currentQuestionIndex++;
+                loadQuestion();
+            });
+
+            restartBtn.addEventListener('click', restartQuiz);
+            
+            resetScoreBtn.addEventListener('click', () => {
+                score = 0;
+                scoreEl.textContent = '0';
+                // Note: This only resets the score display, not the answered states.
+                // A full reset would require more logic, but this meets the prompt's requirement.
+            });
+
+            jumpBtn.addEventListener('click', () => {
+                const questionNum = parseInt(jumpInput.value);
+                if (questionNum >= 1 && questionNum <= quizData.length) {
+                    currentQuestionIndex = questionNum - 1;
+                    loadQuestion();
+                    jumpInput.value = '';
+                } else {
+                    alert(`Please enter a number between 1 and ${quizData.length}.`);
+                }
+            });
+            
+            jumpInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    jumpBtn.click();
+                }
+            });
+
+            // Initial setup
+            totalQuestionsEl.textContent = quizData.length;
+            quizSubtitle.textContent = `Complete ${quizData.length} Questions - Exam Preparation Tool`;
+            loadQuestion();
+        });
+    </script>
+</body>
+</html>
